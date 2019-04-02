@@ -12,90 +12,96 @@ require_relative '../pinhole.rb'
 ORG_ID = ENV['REACTOR_ORG_ID']
 $Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  0
 
-def show_entity(indent, entity, extra=nil)
-  id = entity.id
-  rev = entity.data.dig('attributes', 'revision_number')
-  id = "#{id} r#{rev}" if rev
-  name = entity.name && entity.name != '' ? %Q[ "#{entity.name}"] : ''
-  extra = ' ' + extra if extra && extra != ''
-  puts "#{indent}#{id}#{name}#{extra}"
-end
-def show_entities(indent, entities, plural_name)
-  if entities.each { |entity| show_entity(indent, entity) }.empty?
-    puts "#{indent}# no #{plural_name}"
+class Object
+  def show(indent)
+    self.basic_show(indent)
   end
 end
 
-def show_extension(indent, extension)
-  show_entity(indent, extension)
-end
-def show_extensions(indent, extensions)
-  if extensions.each { |lib| show_extension(indent, lib) }.empty?
-    puts "#{indent}# no Extensions"
+class Array
+  def show_list(type, indent)
+    if size > 0
+      # puts "#{indent}#{type} (#{size})" unless type == 'no heading'
+      each { |element| element.show(indent) }
+    elsif type != "no heading"
+      puts "#{indent}no #{type}"
+    end
+  end
+  def show(indent)
+    show_list('unknowns', indent)
   end
 end
 
-def show_build(indent, build)
-  show_entity(indent, build)
-end
-def show_builds(indent, builds)
-  if builds.each { |lib| show_build(indent, lib) }.empty?
-    puts "#{indent}# no Builds"
+class Entity
+  def display_revision
+    rev = data.dig('attributes', 'revision_number')
+    rev && rev != '' ? " r#{rev}" : ''
+  end
+
+  def display_name
+    name && name != '' ? %Q[ "#{name}"] : ''
+  end
+
+  def basic_show(indent, extra = nil)
+    extra_text = extra && extra != '' ? " #{extra}" : ''
+    puts "#{indent}#{id}#{display_revision}#{display_name}#{extra_text}"
   end
 end
 
-def show_callback(indent, callback)
-  url = callback.data && callback.data.dig('attributes', 'url')
-  subs = callback.data && callback.data.dig('attributes', 'subscriptions')
-  subscriptions = "#{url}  <=   #{subs}" if url || subs
-  show_entity(indent, callback, subscriptions)
-end
-def show_callbacks(indent, callbacks)
-  if callbacks.each { |lib| show_callback(indent, lib) }.empty?
-    puts "#{indent}# no Callbacks"
+class Build
+  def get_library
+    lib_id = data && data.dig('relationships', 'library', 'data', 'id')
+    lib_id == '' ? nil : "of #{lib_id}"
+  end
+
+  def get_status
+    status = data && data.dig('attributes', 'status')
+    status == '' ? nil : status
+  end
+
+  def at
+    time = data.dig('attributres', 'updated_at') || data.dig('attributes', 'created_at')
+    time == '' ? nil : "at #{time}"
+  end
+
+  def show(indent)
+    basic_show(indent, [get_library, get_status, at].compact.join(' '))
   end
 end
 
-def show_library(indent, library)
-  show_entity(indent, library)
-  show_resources(indent + '  ', library.resources)
-  show_builds(indent + '  ', library.builds)
-end
-def show_libraries(indent, libraries)
-  if libraries.each { |lib| show_library(indent, lib) }.empty?
-    puts "#{indent}# no Libraries"
+class Callback
+  def show(indent)
+    url = data && data.dig('attributes', 'url')
+    subs = data && data.dig('attributes', 'subscriptions')
+    subscriptions = "#{url}  <=   #{subs}" if url || subs
+    basic_show(indent, subscriptions)
   end
 end
 
-def show_property(indent, property)
-  show_entity(indent, property)
-  indented = indent + '  '
-  show_libraries(indented, property.libraries)
-  show_rules(indented, property.rules)
-  show_callbacks(indented, property.callbacks)
-  show_extensions(indented, property.extensions)
-end
-
-def show_resource(indent, resource)
-  if resource.id =~ /^RL/
-    show_rule(indent, resource)
-  else
-    show_entity(indent, resource)
-  end
-end
-def show_resources(indent, resources)
-  if resources.each { |lib| show_resource(indent, lib) }.empty?
-    puts "#{indent}# no resources"
+class Library
+  def show(indent)
+    basic_show(indent)
+    indent += '  '
+    resources.show_list('resources', indent)
+    builds.show_list('Builds', indent)
   end
 end
 
-def show_rule(indent, rule)
-  show_entity(indent, rule)
-  show_entities(indent + '  ', rule.rule_components, 'RuleComponents')
+class Property
+  def show(indent)
+    basic_show(indent)
+    indent += '  '
+    libraries.show_list('Libraries', indent)
+    rules.show_list('Rules', indent)
+    callbacks.show_list('Callbacks', indent)
+    extensions.show_list('Extensions', indent)
+  end
 end
-def show_rules(indent, rules)
-  if rules.each { |lib| show_rule(indent, lib) }.empty?
-    puts "#{indent}# no Rules"
+
+class Rule
+  def show(indent)
+    basic_show(indent)
+    rule_components.show_list('no heading', indent + '  ')
   end
 end
 
@@ -116,9 +122,7 @@ def main
   else
     properties = org.company('ANY').property('ALL')
   end
-  if properties.each { |property| show_property('', property) }.empty?
-    puts "# no Properties"
-  end
+  properties.show_list('Properties', '')
 rescue GenericError => error
   puts "Exception:\n  #{error.to_s}"
 end
