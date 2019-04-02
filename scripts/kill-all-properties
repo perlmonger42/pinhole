@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 # vim: filetype=ruby
 
-# create-a-company:
-#   Create a faked company in my org.
+# kill-all-properties:
+#   Find any Company in my Org and delete all its Properties.
 
-require_relative 'pinhole.rb'
+require_relative '../pinhole.rb'
 
 ORG_ID = ENV['REACTOR_ORG_ID']
 $Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
@@ -13,7 +13,8 @@ def main
   blacksmith = Blacksmith.new
   puts "Server: #{blacksmith}" if $Verbose >= 1
   org = Org.find(blacksmith, id: ORG_ID)
-  org.company('NEW')
+  company = org.company('ANY')
+  company.property('ALL').each do |p| p.delete end
 rescue GenericError => error
   puts "Exception:\n  #{error.to_s}"
 end

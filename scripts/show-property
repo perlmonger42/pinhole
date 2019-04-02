@@ -7,7 +7,7 @@
 # show-properties PR77d21c9d23dd4d17b5eb147086d5e7ff
 #   Show all the content of the identified property
 
-require_relative 'pinhole.rb'
+require_relative '../pinhole.rb'
 
 ORG_ID = ENV['REACTOR_ORG_ID']
 $Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  0

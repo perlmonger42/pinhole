@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 # vim: filetype=ruby
 
-# list-all-properties
-#   List all properties on any company in my org.
+# find-all-extension-packages
+#   Find all the Extension packages available to my Org.
 
-require_relative 'pinhole.rb'
+require_relative '../pinhole.rb'
 
 ORG_ID = ENV['REACTOR_ORG_ID']
 $Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
@@ -13,7 +13,7 @@ def main
   blacksmith = Blacksmith.new
   puts "Server: #{blacksmith}" if $Verbose >= 1
   org = Org.find(blacksmith, id: ORG_ID)
-  (org.company(ENV['REACTOR_TEST_COMPANY_ID']) ||org.company('ANY')).property('ALL')
+  org.extension_package('ALL')
 rescue GenericError => error
   puts "Exception:\n  #{error.to_s}"
 end

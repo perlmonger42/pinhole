@@ -5,7 +5,7 @@
 #   List all the companies belonging to the organization identified by:
 #     ARGV[0] || ENV['REACTOR_TEST_COMPANY'] || ENV['REACTOR_COMPANY_ID']
 
-require_relative 'pinhole.rb'
+require_relative '../pinhole.rb'
 
 ORG_ID = ARGV.first || ENV['REACTOR_ORG_ID'] || ENV['REACTOR_TEST_ORG_ID']
 $Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2

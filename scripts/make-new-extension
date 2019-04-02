@@ -7,7 +7,7 @@
 #   Find or fake one Extension Package accessible to (? my Org).
 #   Make a new Extension on the Property based on the Extension Package.
 
-require_relative 'pinhole.rb'
+require_relative '../pinhole.rb'
 
 ORG_ID = ENV['REACTOR_ORG_ID']
 $Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2

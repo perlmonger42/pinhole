@@ -1,15 +1,13 @@
 #!/usr/bin/env ruby
 # vim: filetype=ruby
 
-# make-new-adapter
-#   Find any Company in my Org.
-#   Find or fake one Property on the Company.
-#   Make new Adapter on the Property.
+# list-all-libraries
+#   Find all the Libraries on any Property of any Company in my Org.
 #
-# make-new-adapter PRa8139fa0d10547c8a6f64912fe6afed4
-#   Make new Adapter on the named Property.
+# list-all-libraries PRa8139fa0d10547c8a6f64912fe6afed4
+#   Find all the Libraries on the named Property.
 
-require_relative 'pinhole.rb'
+require_relative '../pinhole.rb'
 
 ORG_ID = ENV['REACTOR_ORG_ID']
 $Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
@@ -24,11 +22,11 @@ def main
     exit 1
   elsif ARGV.size > 0
     property = Property.find(blacksmith, id: ARGV[0])
-    property.adapter('NEW')
+    property.library('ALL')
   else
     org = Org.find(blacksmith, id: ORG_ID)
-    property = org.company('ANY').property('ONE')
-    adapter = property.adapter('NEW')
+    property = org.company('ANY').property('ANY')
+    property.library('ALL')
   end
 rescue GenericError => error
   puts "Exception:\n  #{error.to_s}"

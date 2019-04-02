@@ -1,20 +1,19 @@
 #!/usr/bin/env ruby
 # vim: filetype=ruby
 
-# find-the-profile
-#   Find the profile for the logged-in user
+# create-a-company:
+#   Create a faked company in my org.
 
-require_relative 'pinhole.rb'
+require_relative '../pinhole.rb'
+
+ORG_ID = ENV['REACTOR_ORG_ID']
 $Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
 
 def main
   blacksmith = Blacksmith.new
   puts "Server: #{blacksmith}" if $Verbose >= 1
-  if ARGV.size != 0
-    puts "usage: #{$0}"
-  else
-    User.profile(blacksmith)
-  end
+  org = Org.find(blacksmith, id: ORG_ID)
+  org.company('NEW')
 rescue GenericError => error
   puts "Exception:\n  #{error.to_s}"
 end

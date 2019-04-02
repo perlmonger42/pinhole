@@ -4,7 +4,7 @@
 # find-the-property PRd5bbbc329db04f63bb507b7b1240c198
 #   Find the property with the given ID
 
-require_relative 'pinhole.rb'
+require_relative '../pinhole.rb'
 $Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
 
 def main

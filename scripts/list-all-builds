@@ -10,7 +10,7 @@
 # list-all-builds LB38c55035268447d9a8cc7e7e567090d5
 #   Find all the Builds of the named Library.
 
-require_relative 'pinhole.rb'
+require_relative '../pinhole.rb'
 
 ORG_ID = ENV['REACTOR_ORG_ID']
 $Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2

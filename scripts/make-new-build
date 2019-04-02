@@ -1,18 +1,17 @@
 #!/usr/bin/env ruby
 # vim: filetype=ruby
 
-# link-new-resource
-#   Find any Company in my Org
-#   Find or fake one Property on the Company
-#   Find or fake one Adapter on the Property
-#   Make a new Environment linked to the Adapter
-#   Make a new Library linked to the Environment
-#   Link a new Resource to the Library
+# make-new-build
+#   Find one Property on one Company in my Org.
+#   Find one Adapter on my Property
+#   Make new Environment linked to the Adapter
+#   Make new Library linked to the Environment
+#   Make new Build on the Library
 #
-# link-new-resource LBLB33852c666fb347ecb4fbbd91dc85ec9c
-#   Link a new Resource to the ID'ed Library
+# make-new-build LBLB33852c666fb347ecb4fbbd91dc85ec9c
+#   Make new Build on the named Library
 
-require_relative 'pinhole.rb'
+require_relative '../pinhole.rb'
 
 ORG_ID = ENV['REACTOR_ORG_ID']
 $Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
@@ -22,23 +21,21 @@ def main
   puts "Server: #{blacksmith}" if $Verbose >= 1
   if ARGV.size > 1
     puts "usage: #{$0} [LIBRARY_ID]"
-    exit 1
   elsif ARGV.size == 1 && ARGV[0] !~ /^LB[0-9a-fA-F]{32}$/
     puts "Argument is not a Library ID: #{ARGV[0]}"
-    exit 2
+    exit 1
   elsif ARGV.size == 1
     library = Library.find(blacksmith, id: ARGV[0])
-    property_id = library.data.dig('relationships', 'property', 'data', 'id')
-    property = Property.find(blacksmith, id: property_id)
+    library.build
   else
     org = Org.find(blacksmith, id: ORG_ID)
     property = org.company('ONE').property('ONE')
     adapter = property.adapter('ONE')
     environment = property.environment('NEW', adapter: adapter)
     library = property.library('NEW', environment: environment)
+    library.load
+    library.start_build
   end
-  revised_de = property.data_element('ONE').revise
-  library.link_resources(revised_de.id)
 rescue GenericError => error
   puts "Exception:\n  #{error.to_s}"
 end

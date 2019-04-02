@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 # vim: filetype=ruby
 
-# find-the-build BLa8139fa0d10547c8a6f64912fe6afed4
-#   Find the identified Build.
+# find-the-adapter ADa8139fa0d10547c8a6f64912fe6afed4
+#   Find the identified Adapter.
 
-require_relative 'pinhole.rb'
+require_relative '../pinhole.rb'
 
 ORG_ID = ENV['REACTOR_ORG_ID']
 $Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
@@ -13,13 +13,13 @@ def main
   blacksmith = Blacksmith.new
   puts "Server: #{blacksmith}" if $Verbose >= 1
   if ARGV.size != 1
-    puts "usage: #{$0} BUILD_ID"
-  elsif ARGV[0] !~ /^BL[0-9a-fA-F]{32}$/
-    puts "Argument is not an Build ID: #{ARGV[0]}"
+    puts "usage: #{$0} ADAPTER_ID"
+  elsif ARGV[0] !~ /^AD[0-9a-fA-F]{32}$/
+    puts "Argument is not an Adapter ID: #{ARGV[0]}"
     exit 1
   else
-    build = Build.find(blacksmith, id: ARGV[0]).load
-    pp build if $Verbose >= 5
+    adapter = Adapter.find(blacksmith, id: ARGV[0]).load
+    pp adapter if $Verbose >= 5
   end
 rescue GenericError => error
   puts "Exception:\n  #{error.to_s}"

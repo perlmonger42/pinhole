@@ -1,13 +1,13 @@
 #!/usr/bin/env ruby
 # vim: filetype=ruby
 
-# list-all-libraries
-#   Find all the Libraries on any Property of any Company in my Org.
+# list-all-adapters
+#   Find all the Adapters on any Property on any Company in my Org.
 #
-# list-all-libraries PRa8139fa0d10547c8a6f64912fe6afed4
-#   Find all the Libraries on the named Property.
+# list-all-adapters PRa8139fa0d10547c8a6f64912fe6afed4
+#   Find all the Adapters on the named Property.
 
-require_relative 'pinhole.rb'
+require_relative '../pinhole.rb'
 
 ORG_ID = ENV['REACTOR_ORG_ID']
 $Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
@@ -22,11 +22,11 @@ def main
     exit 1
   elsif ARGV.size > 0
     property = Property.find(blacksmith, id: ARGV[0])
-    property.library('ALL')
+    property.adapter('ALL')
   else
     org = Org.find(blacksmith, id: ORG_ID)
     property = org.company('ANY').property('ANY')
-    property.library('ALL')
+    adapter = property.adapter('ALL')
   end
 rescue GenericError => error
   puts "Exception:\n  #{error.to_s}"
