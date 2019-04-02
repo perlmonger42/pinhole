@@ -1,0 +1,63 @@
+#!/usr/bin/env ruby
+# vim: filetype=ruby
+
+# make-new-extension
+#   Find or fake one Company in my Org.
+#   Find or fake one Property on the Company.
+#   Find or fake one Extension Package accessible to (? my Org).
+#   Make a new Extension on the Property based on the Extension Package.
+
+require_relative 'pinhole.rb'
+
+ORG_ID = ENV['REACTOR_ORG_ID']
+$Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
+
+def die(msg)
+  STDERR.puts msg
+  raise "Terminated with prejudice"
+end
+
+def main
+  blacksmith = Blacksmith.new
+  puts "Server: #{blacksmith}" if $Verbose >= 1
+  org = Org.find(blacksmith, id: ORG_ID)
+  company, property, extension_package = nil, nil, nil
+  while ARGV.size > 0
+    if ARGV[0] =~ /^CO[0-9a-fA-F]{32}$/
+      id = ARGV.shift
+      if company
+        die "Unexpected parameter: #{id} (already loaded #{company.id})"
+      else
+        (company = Company.find(blacksmith, id: id)) or
+          die "#{id} not found"
+      end
+    elsif ARGV[0] =~ /^PR[0-9a-fA-F]{32}$/
+      id = ARGV.shift
+      if property
+        die "Unexpected parameter: #{id} (already loaded #{property.id})"
+      else
+        (property = Property.find(blacksmith, id: id)) or
+          die "#{id} not found"
+      end
+    elsif ARGV[0] =~ /^EP[0-9a-fA-F]{32}$/
+      id = ARGV.shift
+      if extension_package
+        die "Unexpected parameter: #{id} (already loaded #{extension_package.id})"
+      else
+        (extension_package = ExtensionPackage.find(blacksmith, id: id)) or
+          die "#{id} not found"
+      end
+    else
+      die "Unexpected parameter: #{ARGV[0]}\n" +
+        "usage: #{$0} [COMPANY_ID] [PROPERTY_ID] [EXTENSION_PACKAGE_ID]"
+    end
+  end
+  company ||= org.company('ONE')
+  property ||= company.property('ONE')
+  extension_package ||= org.extension_package('ONE')
+  property.make_extension(extension_package: extension_package)
+rescue GenericError => error
+  puts "Exception:\n  #{error.to_s}"
+end
+
+main

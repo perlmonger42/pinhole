@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+# vim: filetype=ruby
+
+# find-the-company
+#   Find the company whose id is
+#     ARGV[0] || ENV['REACTOR_TEST_COMPANY'] || ENV['REACTOR_COMPANY_ID']
+
+require_relative 'pinhole.rb'
+
+COMPANY_ID = ARGV.first ||
+  ENV['REACTOR_TEST_COMPANY_ID'] ||
+  ENV['REACTOR_COMPANY_ID']
+$Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
+
+def main
+  raise 'Define ARGV[0], REACTOR_TEST_COMPANY_ID, or REACTOR_COMPANY_ID' unless
+    COMPANY_ID && COMPANY_ID != ''
+  raise "Invalid Company ID: #{COMPANY_ID.inspect}" unless
+    COMPANY_ID =~ /^CO[0-9a-f]{32}$/i
+  blacksmith = Blacksmith.new
+  puts "Server: #{blacksmith}" if $Verbose >= 1
+  Company.find(blacksmith, id: COMPANY_ID)
+rescue GenericError => error
+  puts "Exception:\n  #{error.to_s}"
+end
+
+main

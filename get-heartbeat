@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+# vim: filetype=ruby
+
+# find-the-profile
+#   Find the profile for the logged-in user
+
+require_relative 'pinhole.rb'
+$Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
+
+def main
+  blacksmith = Blacksmith.new
+  puts "Server: #{blacksmith}" if $Verbose >= 1
+  if ARGV.size != 0
+    puts "usage: #{$0}"
+  else
+    Heartbeat.get(blacksmith)
+  end
+rescue GenericError => error
+  puts "Exception:\n  #{error.to_s}"
+end
+
+main

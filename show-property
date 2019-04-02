@@ -1,0 +1,126 @@
+#!/usr/bin/env ruby
+# vim: filetype=ruby
+
+# show-properties
+#   Show all the content of all properties on any company in my org
+#
+# show-properties PR77d21c9d23dd4d17b5eb147086d5e7ff
+#   Show all the content of the identified property
+
+require_relative 'pinhole.rb'
+
+ORG_ID = ENV['REACTOR_ORG_ID']
+$Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  0
+
+def show_entity(indent, entity, extra=nil)
+  id = entity.id
+  rev = entity.data.dig('attributes', 'revision_number')
+  id = "#{id} r#{rev}" if rev
+  name = entity.name && entity.name != '' ? %Q[ "#{entity.name}"] : ''
+  extra = ' ' + extra if extra && extra != ''
+  puts "#{indent}#{id}#{name}#{extra}"
+end
+def show_entities(indent, entities, plural_name)
+  if entities.each { |entity| show_entity(indent, entity) }.empty?
+    puts "#{indent}# no #{plural_name}"
+  end
+end
+
+def show_extension(indent, extension)
+  show_entity(indent, extension)
+end
+def show_extensions(indent, extensions)
+  if extensions.each { |lib| show_extension(indent, lib) }.empty?
+    puts "#{indent}# no Extensions"
+  end
+end
+
+def show_build(indent, build)
+  show_entity(indent, build)
+end
+def show_builds(indent, builds)
+  if builds.each { |lib| show_build(indent, lib) }.empty?
+    puts "#{indent}# no Builds"
+  end
+end
+
+def show_callback(indent, callback)
+  url = callback.data && callback.data.dig('attributes', 'url')
+  subs = callback.data && callback.data.dig('attributes', 'subscriptions')
+  subscriptions = "#{url}  <=   #{subs}" if url || subs
+  show_entity(indent, callback, subscriptions)
+end
+def show_callbacks(indent, callbacks)
+  if callbacks.each { |lib| show_callback(indent, lib) }.empty?
+    puts "#{indent}# no Callbacks"
+  end
+end
+
+def show_library(indent, library)
+  show_entity(indent, library)
+  show_resources(indent + '  ', library.resources)
+  show_builds(indent + '  ', library.builds)
+end
+def show_libraries(indent, libraries)
+  if libraries.each { |lib| show_library(indent, lib) }.empty?
+    puts "#{indent}# no Libraries"
+  end
+end
+
+def show_property(indent, property)
+  show_entity(indent, property)
+  indented = indent + '  '
+  show_libraries(indented, property.libraries)
+  show_rules(indented, property.rules)
+  show_callbacks(indented, property.callbacks)
+  show_extensions(indented, property.extensions)
+end
+
+def show_resource(indent, resource)
+  if resource.id =~ /^RL/
+    show_rule(indent, resource)
+  else
+    show_entity(indent, resource)
+  end
+end
+def show_resources(indent, resources)
+  if resources.each { |lib| show_resource(indent, lib) }.empty?
+    puts "#{indent}# no resources"
+  end
+end
+
+def show_rule(indent, rule)
+  show_entity(indent, rule)
+  show_entities(indent + '  ', rule.rule_components, 'RuleComponents')
+end
+def show_rules(indent, rules)
+  if rules.each { |lib| show_rule(indent, lib) }.empty?
+    puts "#{indent}# no Rules"
+  end
+end
+
+def main
+  blacksmith = Blacksmith.new
+  puts "Server: #{blacksmith}" if $Verbose >= 1
+  org = Org.find(blacksmith, id: ORG_ID)
+
+  if ARGV.size > 1
+    puts "usage: #{$0} [PROPERTY_ID]"
+    exit 1
+  elsif ARGV.size > 0 && ARGV[0] !~ /^PR[0-9a-fA-F]{32}$/
+    puts "Argument is not a Property ID: #{ARGV[0]}"
+    exit 2
+  elsif ARGV.size > 0
+    property = Property.find(blacksmith, id: ARGV[0])
+    properties = [property]
+  else
+    properties = org.company('ANY').property('ALL')
+  end
+  if properties.each { |property| show_property('', property) }.empty?
+    puts "# no Properties"
+  end
+rescue GenericError => error
+  puts "Exception:\n  #{error.to_s}"
+end
+
+main
