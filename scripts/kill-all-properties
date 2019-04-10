@@ -14,9 +14,9 @@ def main
   puts "Server: #{blacksmith}" if $Verbose >= 1
   org = Org.find(blacksmith, id: ORG_ID)
   company = org.company('ANY')
-  company.property('ALL').each do |p| p.delete end
+  company.property('ALL').each { |p| p.delete }
 rescue GenericError => error
-  puts "Exception:\n  #{error.to_s}"
+  puts "Exception (#{error.class}):\n  #{error.to_s}"
 end
 
 main

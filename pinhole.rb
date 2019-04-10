@@ -76,8 +76,12 @@ def raise_html_error(response, errors)
   raise HtmlError.new(response: response)
 end
 
+class PinholeError < GenericError
+end
+
 def Oops(**hash)
-  GenericError.new(hash)
+  caller_infos = caller.first.split(":")
+  raise PinholeError.new(file: caller_infos[0], line: caller_infos[1], **hash)
 end
 
 class Blacksmith
