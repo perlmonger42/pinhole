@@ -175,6 +175,7 @@ class Blacksmith
   def response_to_entities(verb, request_uri, response)
     if 200 <= response.code && response.code < 300
       return nil if response.headers['content-length'] == "0"
+      return nil if response.headers['content-type'] == nil;
       if response.headers['content-type'] =~ %r{^application/vnd.api\+json}
         ##### require "json-api-vanilla"
         ##### doc = JSON::Api::Vanilla.json(response.body)
