@@ -1,8 +1,16 @@
 #!/usr/bin/env ruby
 # vim: filetype=ruby
 
-# list-all-properties
-#   List all properties on any company in my org.
+# env -u REACTOR_TEST_COMPANY_ID list-all-properties
+#   List all Properties on all Companies in my org.
+# `env -u BLAH whatever` removes BLAH from the environment and then runs
+# `whatever`.
+
+# REACTOR_TEST_COMPANY=your_company_id list-all-properties
+#   List all Properties on the identified Company.
+
+# list-all-properties your_company_id
+#   List all Properties on the identified Company.
 
 require_relative '../pinhole.rb'
 
@@ -12,8 +20,31 @@ $Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
 def main
   blacksmith = Blacksmith.new
   puts "Server: #{blacksmith}" if $Verbose >= 1
+  if ARGV.size == 0
+    companyId = ENV['REACTOR_TEST_COMPANY_ID'] || 'ALL'
+  elsif ARGV.size == 1
+    companyId = ARGV[0]
+  else
+    puts "usage: #{$0} [COMPANY_ID]"
+    exit 1
+  end
+  if companyId != 'ALL' && companyId !~ /^CO[0-9a-fA-F]{32}$/i
+    puts "Argument is not a Company ID: #{ARGV[0]}"
+    exit 2
+  end
+
   org = Org.find(blacksmith, id: ORG_ID)
-  (org.company(ENV['REACTOR_TEST_COMPANY_ID']) ||org.company('ANY')).property('ALL')
+  if companyId == 'ALL'
+    companies = org.company('ALL')
+  elsif companyId =~ /^CO[0-9a-fA-F]{32}$/i
+    companies = [ org.company(companyId) ]
+  else
+    puts "Argument is not a Company ID: #{ARGV[0]}"
+    exit 2
+  end
+  companies.each do |co|
+    properties = co.property('ALL')
+  end
 rescue GenericError => error
   puts "Exception:\n  #{error.to_s}"
 end

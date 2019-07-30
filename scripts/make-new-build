@@ -3,8 +3,8 @@
 
 # make-new-build
 #   Find one Property on one Company in my Org.
-#   Find one Adapter on my Property
-#   Make new Environment linked to the Adapter
+#   Find one Host on my Property
+#   Make new Environment linked to the Host
 #   Make new Library linked to the Environment
 #   Make new Build on the Library
 #
@@ -30,8 +30,8 @@ def main
   else
     org = Org.find(blacksmith, id: ORG_ID)
     property = org.company('ONE').property('ONE')
-    adapter = property.adapter('ONE')
-    environment = property.environment('NEW', adapter: adapter)
+    host = property.host('ONE')
+    environment = property.environment('NEW', host: host)
     library = property.library('NEW', environment: environment)
     library.load
     library.start_build

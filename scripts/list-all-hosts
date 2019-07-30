@@ -1,14 +1,11 @@
 #!/usr/bin/env ruby
 # vim: filetype=ruby
+
+# list-all-hosts
+#   Find all the Hosts on all Properties on any Company in my Org.
 #
-puts "NOT YET IMPLEMENTED"
-puts "pending creation of make-new-extension"
-exit 1
-# make-new-rule-component
-#   Find any Company in my Org.
-#   Find or fake one Property on the Company.
-#   Find or fake one Extension on the Property.
-#   ...
+# list-all-hosts PRa8139fa0d10547c8a6f64912fe6afed4
+#   Find all the Hosts on the named Property.
 
 require_relative '../pinhole.rb'
 
@@ -25,11 +22,17 @@ def main
     exit 1
   elsif ARGV.size > 0
     property = Property.find(blacksmith, id: ARGV[0])
-    property.adapter('NEW')
+    property.host('ALL')
   else
     org = Org.find(blacksmith, id: ORG_ID)
-    property = org.company('ANY').property('ONE')
-    adapter = property.adapter('NEW')
+    properties = org.company('ANY').property('ALL')
+    properties.each do |property|
+      hosts = property.host('ALL')
+    end
+
+    # Instead: Find all the Hosts on ANY Property on any Company in my Org.
+    #property = org.company('ANY').property('ANY')
+    #hosts = property.host('ALL')
   end
 rescue GenericError => error
   puts "Exception:\n  #{error.to_s}"

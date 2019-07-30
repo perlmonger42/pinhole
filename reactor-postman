@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+# vim: filetype=ruby
+# Demonstrate provisioning a new property, creating extensions, rules, and
+# data elements, and initiating a library build. This is modelled after
+# the Postman examples in github [reactor-postman](
+# https://github.com/Adobe-Marketing-Cloud/reactor-postman).
+
+# reactor-postman
+#   Make a new Property named like "Super Awesome Property - 8"
+#
+
+require_relative 'pinhole.rb'
+
+ORG_ID = ENV['REACTOR_ORG_ID']
+
+def main
+  $Verbose = 2
+  @server = blacksmith = Blacksmith.new
+  puts "Server: #{blacksmith}" if $Verbose >= 1
+  company = Org.find(blacksmith, id: ORG_ID).company('ONE')
+  max = find_max_awesome(company)
+
+  # This doesn't work, because make-with-data is not implemented:
+  p = Property.make(@server, {
+    name: "Super Awesome Property - #{max + 1}", platform: "web"
+  })
+  exit
+rescue GenericError => error
+  puts "Exception:\n  #{error.to_s}"
+end
+
+def find_max_awesome(company)
+  max = 0
+  properties = @server.get(
+    "/companies/#{company.id}/properties" +
+    '?filter[name]=LIKE Super Awesome Property')
+  properties.each do |p|
+    Entity.trace(p)
+    if p.name =~ /Super Awesome Property - (\d+)/
+      n = $1.to_i
+      max = n if n > max
+    end
+  end
+  max
+end
+
+main

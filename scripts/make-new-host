@@ -1,11 +1,13 @@
 #!/usr/bin/env ruby
 # vim: filetype=ruby
 
-# list-all-adapters
-#   Find all the Adapters on any Property on any Company in my Org.
+# make-new-host
+#   Find any Company in my Org.
+#   Find or fake one Property on the Company.
+#   Make new Host on the Property.
 #
-# list-all-adapters PRa8139fa0d10547c8a6f64912fe6afed4
-#   Find all the Adapters on the named Property.
+# make-new-host PRa8139fa0d10547c8a6f64912fe6afed4
+#   Make new Host on the named Property.
 
 require_relative '../pinhole.rb'
 
@@ -22,11 +24,11 @@ def main
     exit 1
   elsif ARGV.size > 0
     property = Property.find(blacksmith, id: ARGV[0])
-    property.adapter('ALL')
+    property.host('NEW')
   else
     org = Org.find(blacksmith, id: ORG_ID)
-    property = org.company('ANY').property('ANY')
-    adapter = property.adapter('ALL')
+    property = org.company('ANY').property('ONE')
+    host = property.host('NEW')
   end
 rescue GenericError => error
   puts "Exception:\n  #{error.to_s}"

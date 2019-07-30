@@ -20,15 +20,21 @@ require 'ffaker'
 # $Verbose >= 4: also print request headers and response headers
 $Verbose = 2
 
-def id_to_type(id)
-  return 'hosts' if id =~ /^HT/
-  # formerly: return 'adapters' if id =~ /^AD/
+# Default create-an-ExtensionPackage zip-file pathname
+$ZipFile = "#{File.dirname(__FILE__)}/scripts/pinhole-test-EP.zip"
 
+def die(msg)
+  STDERR.puts msg
+  raise "Terminated with prejudice"
+end
+
+def id_to_type(id)
   return 'audit_events' if id =~ /^AE/
   return 'builds' if id =~ /^BL/
   return 'callbacks' if id =~ /^CB/
   return 'companies' if id =~ /^CO/
   return 'data_elements' if id =~ /^DE/
+  return 'hosts' if id =~ /^HT/
   return 'properties' if id =~ /^PR/
   return 'environments' if id =~ /^EN/
   return 'extension_packages' if id =~ /^EP/
@@ -147,7 +153,15 @@ class Blacksmith
     puts "#{response.code} #{response.message}" if $Verbose >= 3 ||
       $Verbose >= 2 && (response.code < 200 || 300 <= response.code)
     puts "headers: #{response.headers}" if $Verbose >= 4 && response.headers
-    puts "body: #{pretty_json(response.body)}" if $Verbose >= 3 && response.body
+    if $Verbose >= 3
+      if !response.body
+        puts "no response body"
+      elsif response.body == ''
+        puts "empty response body"
+      else
+        puts "body: #{pretty_json(response.body)}"
+      end
+    end
     puts "#{response}" if $Verbose >= 4
     response_to_entities verb.to_s.upcase, uri, response
   end
@@ -436,12 +450,17 @@ class Org < Entity
 
   # Returns the requested Extension Package.
   # As in Entity.find, id may be nil/extension_package/'ANY'/'NEW'/'ONE'/id.
-  def extension_package(id)
+  # If id is 'NEW', uploads the extension package 'scripts/pinhole-test-EP.zip'.
+  def extension_package(id, zipfilename=nil)
     ExtensionPackage.find(@server, id: id, context: {
       any: lambda { ExtensionPackage.core(@server) },
-      new: lambda { ExtensionPackage.fake(org: self) },
+      new: lambda { ExtensionPackage.fake(org: self, zipfilename: $ZipFile) },
       all: lambda { extension_packages },
     })
+  end
+
+  def make_extension_package(zipfilename:)
+    ExtensionPackage.fake(org: self, zipfilename: zipfilename)
   end
 end
 
@@ -870,6 +889,17 @@ class ExtensionPackage < Entity
     ep = server.get('/extension_packages?filter[name]=EQ%20core')
     ep = *ep
     @coreEp = ep[0]
+  end
+
+  def self.fake(org:, zipfilename:)
+    f = File.open(zipfilename) || die("Cannot open '#{zipfilename}'")
+    org.server.post("/extension_packages",
+      headers: {
+        'Accept_Encoding': 'gzip, deflate',
+        'Cache_Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+      body: { package: f })
   end
 end
 

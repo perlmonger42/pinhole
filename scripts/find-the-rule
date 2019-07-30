@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+# vim: filetype=ruby
+
+# find-the-rule RLd5bbbc329db04f63bb507b7b1240c198
+#   Find the Rule with the given ID
+
+require_relative '../pinhole.rb'
+$Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
+
+def main
+  blacksmith = Blacksmith.new
+  puts "Server: #{blacksmith}" if $Verbose >= 1
+  if ARGV.size != 1
+    puts "usage: #{$0} RULE_ID"
+  elsif ARGV[0] !~ /^RL[0-9a-fA-F]{32}$/
+    puts "Argument is not a Rule ID: #{ARGV[0]}"
+    exit 1
+  else
+    rule = Rule.find(blacksmith, id: ARGV[0]).load
+  end
+rescue GenericError => error
+  puts "Exception:\n  #{error.to_s}"
+end
+
+main

@@ -1,13 +1,11 @@
 #!/usr/bin/env ruby
 # vim: filetype=ruby
 
-# make-new-adapter
-#   Find any Company in my Org.
-#   Find or fake one Property on the Company.
-#   Make new Adapter on the Property.
+# make-new-callback
+#   Create a new faked Callback on any Property on any Company in my org
 #
-# make-new-adapter PRa8139fa0d10547c8a6f64912fe6afed4
-#   Make new Adapter on the named Property.
+# make-new-callback PR01234567890123456789012345678901
+#   Create a new faked Callback on the identified Property
 
 require_relative '../pinhole.rb'
 
@@ -17,21 +15,26 @@ $Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
 def main
   blacksmith = Blacksmith.new
   puts "Server: #{blacksmith}" if $Verbose >= 1
+
+
   if ARGV.size > 1
     puts "usage: #{$0} [PROPERTY_ID]"
   elsif ARGV.size == 1 && ARGV[0] !~ /^PR[0-9a-fA-F]{32}$/
     puts "Argument is not a Property ID: #{ARGV[0]}"
     exit 1
-  elsif ARGV.size > 0
-    property = Property.find(blacksmith, id: ARGV[0])
-    property.adapter('NEW')
+  elsif ARGV.size == 1
+    property = Property.find(blacksmith, id: ARGV[0]).load
   else
     org = Org.find(blacksmith, id: ORG_ID)
-    property = org.company('ANY').property('ONE')
-    adapter = property.adapter('NEW')
+    property = org.company('ANY').property('ANY')
   end
+  callback = property.callback('NEW')
+  puts "    #{callback.data['attributes']['url']} #{callback.data['attributes']['subscriptions']}"
 rescue GenericError => error
   puts "Exception:\n  #{error.to_s}"
 end
 
 main
+
+
+

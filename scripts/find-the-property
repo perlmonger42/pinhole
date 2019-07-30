@@ -3,21 +3,39 @@
 
 # find-the-property PRd5bbbc329db04f63bb507b7b1240c198
 #   Find the property with the given ID
+# find-the-property
+#   Find the property with the ID $REACTOR_PROPERTY_ID
 
 require_relative '../pinhole.rb'
 $Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
 
+PROPERTY_ID_REGEX = /^PR[0-9a-fA-F]{32}$/
+
+def determine_requested_property_id
+  if ARGV.size == 0 && ENV.has_key?('REACTOR_PROPERTY_ID') && ENV['REACTOR_PROPERTY_ID'] != ''
+    arg = ENV['REACTOR_PROPERTY_ID']
+    src = '$REACTOR_PROPERTY_ID'
+  elsif ARGV.size == 1
+    arg = ARGV[0]
+    src = 'PROPERTY_ID'
+  else
+    puts "usage: #{$0} [PROPERTY_ID]"
+    puts "       PROPERTY_ID defaults to \$REACTOR_PROPERTY_ID"
+    exit 1
+  end
+  if arg !~ PROPERTY_ID_REGEX
+    puts "Argument is not a Property ID: #{arg}"
+    puts "#{src} must match #{PROPERTY_ID_REGEX}"
+    exit 1
+  end
+  arg
+end
+
 def main
+  id = determine_requested_property_id
   blacksmith = Blacksmith.new
   puts "Server: #{blacksmith}" if $Verbose >= 1
-  if ARGV.size != 1
-    puts "usage: #{$0} PROPERTY_ID"
-  elsif ARGV[0] !~ /^PR[0-9a-fA-F]{32}$/
-    puts "Argument is not a Property ID: #{ARGV[0]}"
-    exit 1
-  else
-    property = Property.find(blacksmith, id: ARGV[0]).load
-  end
+  property = Property.find(blacksmith, id: id).load
 rescue GenericError => error
   puts "Exception:\n  #{error.to_s}"
 end

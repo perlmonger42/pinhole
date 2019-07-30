@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+# vim: filetype=ruby
+
+# list-all-rules
+#   List all the Rules on all Properties on any Company in my Org.
+#
+# list-all-rules PRa8139fa0d10547c8a6f64912fe6afed4
+#   List all the Rules on the named Property.
+
+require_relative '../pinhole.rb'
+
+ORG_ID = ENV['REACTOR_ORG_ID']
+$Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
+
+def main
+  blacksmith = Blacksmith.new
+  puts "Server: #{blacksmith}" if $Verbose >= 1
+  if ARGV.size > 1
+    puts "usage: #{$0} [PROPERTY_ID]"
+    exit 1
+  elsif ARGV.size == 1 && ARGV[0] !~ /^PR[0-9a-fA-F]{32}$/
+    puts "Argument is not a Property ID: #{ARGV[0]}"
+    exit 1
+  elsif ARGV.size > 0
+    properties = [Property.find(blacksmith, id: ARGV[0])]
+  else
+    org = Org.find(blacksmith, id: ORG_ID)
+    properties = org.company('ANY').property('ALL')
+  end
+
+  properties.each do |property|
+    puts "Rules for #{property.id}:"
+    rules = property.rule('ALL')
+    rules.each do |rule|
+      puts "Revisions for #{rule.id}:"
+      revs = rule.revisions
+      revs.each do |rev|
+        puts "Rule #{rev.id} is revision ##{rev.data.dig('attributes','revision_number')}"
+      end
+    end
+  end
+
+  # Instead: Find all the Rules on ANY Property on any Company in my Org.
+  #property = org.company('ANY').property('ANY')
+  #rules = property.rule('ALL')
+rescue GenericError => error
+  puts "Exception:\n  #{error.to_s}"
+end
+
+main

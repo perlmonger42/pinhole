@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+# vim: filetype=ruby
+
+# kill-int-properties:
+#   Find any Company in my Org and delete all its Properties that were built
+#   by integration testing (they have names containing either 'integration
+#   testing' or 'an awesome property').
+
+require_relative '../pinhole.rb'
+
+ORG_ID = ENV['REACTOR_ORG_ID']
+$Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
+
+def main
+  blacksmith = Blacksmith.new
+  puts "Server: #{blacksmith}" if $Verbose >= 1
+  org = Org.find(blacksmith, id: ORG_ID)
+  company = org.company('ANY')
+  company.property('ALL').each do |p|
+    name = p.data['attributes']['name']
+    if name =~ /integration testing/i || name =~ /an awesome property/i
+      puts "Deleting #{p.data['id']} #{name}"
+      p.delete
+    else
+      puts "Skipping #{p.data['id']} #{name}"
+    end
+  end
+rescue GenericError => error
+  puts "Exception (#{error.class}):\n  #{error.to_s}"
+end
+
+main

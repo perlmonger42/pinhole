@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+# vim: filetype=ruby
+
+# find-the-host HTa8139fa0d10547c8a6f64912fe6afed4
+#   Find the identified Host (formerly "Adapter").
+
+require_relative '../pinhole.rb'
+
+ORG_ID = ENV['REACTOR_ORG_ID']
+$Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
+
+def main
+  blacksmith = Blacksmith.new
+  puts "Server: #{blacksmith}" if $Verbose >= 1
+  if ARGV.size != 1
+    puts "usage: #{$0} HOST_ID"
+  elsif ARGV[0] !~ /^HT[0-9a-fA-F]{32}$/
+    puts "Argument is not a HOST ID: #{ARGV[0]}"
+    exit 1
+  else
+    host = Host.find(blacksmith, id: ARGV[0]).load
+    pp host if $Verbose >= 5
+  end
+rescue GenericError => error
+  puts "Exception:\n  #{error.to_s}"
+end
+
+main

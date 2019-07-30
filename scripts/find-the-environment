@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+# vim: filetype=ruby
+
+# find-the-environment EN5bbbc329db04f63bb507b7b1240c198
+#   Find the Environment with the given ID
+
+require_relative '../pinhole.rb'
+$Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
+
+def main
+  blacksmith = Blacksmith.new
+  puts "Server: #{blacksmith}" if $Verbose >= 1
+  if ARGV.size != 1
+    puts "usage: #{$0} ENVIRONMENT_ID"
+  elsif ARGV[0] !~ /^EN[0-9a-fA-F]{32}$/
+    puts "Argument is not a Environment ID: #{ARGV[0]}"
+    exit 1
+  else
+    en = Environment.find(blacksmith, id: ARGV[0]).load
+    data = en.data
+    attr = data['attributes']
+    puts "    name:    \"#{attr['name']}\""
+    puts "    id:      #{en.id}"
+    puts "    stage:   #{en.instance_variable_get(:@stage)}"
+    puts "    status:  #{en.instance_variable_get(:@status)}"
+    puts "    created: #{attr['created_at']}"
+    puts "    updated: #{en.instance_variable_get(:@updated_at)}"
+    puts "    lib:     #{data.dig(*%w(relationships library data id))}"
+    puts "    host:    #{data.dig(*%w(relationships host data id))}"
+    puts "    prop:    #{data.dig(*%w(relationships property data id))}"
+  end
+rescue GenericError => error
+  puts "Exception:\n  #{error.to_s}"
+end
+
+main

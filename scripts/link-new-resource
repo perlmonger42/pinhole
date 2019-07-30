@@ -4,10 +4,10 @@
 # link-new-resource
 #   Find any Company in my Org
 #   Find or fake one Property on the Company
-#   Find or fake one Adapter on the Property
-#   Make a new Environment linked to the Adapter
+#   Find or fake one Host on the Property
+#   Make a new Environment linked to the Host
 #   Make a new Library linked to the Environment
-#   Link a new Resource to the Library
+#   Link a new resource (a DataElement) to the Library
 #
 # link-new-resource LBLB33852c666fb347ecb4fbbd91dc85ec9c
 #   Link a new Resource to the ID'ed Library
@@ -33,11 +33,12 @@ def main
   else
     org = Org.find(blacksmith, id: ORG_ID)
     property = org.company('ONE').property('ONE')
-    adapter = property.adapter('ONE')
-    environment = property.environment('NEW', adapter: adapter)
+    host = property.host('ONE')
+    environment = property.environment('NEW', host: host)
     library = property.library('NEW', environment: environment)
   end
   revised_de = property.data_element('ONE').revise
+  $debugging = true
   library.link_resources(revised_de.id)
 rescue GenericError => error
   puts "Exception:\n  #{error.to_s}"
