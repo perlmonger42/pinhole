@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+# vim: filetype=ruby
+
+# kill-the-extension-package HTa8139fa0d10547c8a6f64912fe6afed4
+#   Delete the identified Extension Package.
+
+require_relative '../pinhole.rb'
+
+ORG_ID = ENV['REACTOR_ORG_ID']
+PACKAGE_ID = ARGV.first ||
+  ENV['REACTOR_TEST_EXTENSION_PACKAGE_ID'] ||
+  ENV['REACTOR_EXTENSION_PACKAGE_ID']
+PACKAGE_ID_REGEX = /^EP[0-9a-f]{32}$/i
+$Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
+
+def main
+  raise 'Define ARGV[0], REACTOR_TEST_EXTENSION_PACKAGE_ID, or REACTOR_EXTENSION_PACKAGE_ID' unless
+    PACKAGE_ID && PACKAGE_ID != ''
+  raise "Invalid Extension Package ID: #{PACKAGE_ID.inspect}" unless
+    PACKAGE_ID =~ PACKAGE_ID_REGEX
+  blacksmith = Blacksmith.new
+  puts "Server: #{blacksmith}" if $Verbose >= 1
+  if ARGV.size != 1
+    puts "usage: #{$0} EXTENSION_PACKAGE_ID"
+  elsif ARGV[0] !~ PACKAGE_ID_REGEX
+    puts "Argument is not an Extension Package ID: #{ARGV[0]}"
+    exit 1
+  else
+    extension_package = ExtensionPackage.new(blacksmith, ARGV[0])
+    extension_package.delete
+  end
+rescue GenericError => error
+  puts "Exception:\n  #{error.to_s}"
+end
+
+main
