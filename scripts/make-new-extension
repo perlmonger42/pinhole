@@ -1,11 +1,14 @@
 #!/usr/bin/env ruby
 # vim: filetype=ruby
 
-# make-new-extension
-#   Find or fake one Company in my Org.
-#   Find or fake one Property on the Company.
-#   Find or fake one Extension Package accessible to (? my Org).
+# make-new-extension [COMPANY_ID] [PROPERTY_ID] [EXTENSION_PACKAGE_ID]"
+#   Load, find, or fake one Company in my Org.
+#   Load, find, or fake one Property on the Company.
+#   Load, find, or fake one Extension Package accessible to (? my Org).
 #   Make a new Extension on the Property based on the Extension Package.
+# To `load` a resource means to find it based on a commandline ID.
+# To `find` a resource means to choose randomly from among existing resources.
+# To `fake` a resource means to construct a new resource with random data.
 
 require_relative '../pinhole.rb'
 
@@ -14,47 +17,57 @@ $Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
 
 def die(msg)
   STDERR.puts msg
-  raise "Terminated with prejudice"
+  exit(1)
+end
+
+def blacksmith
+  @blacksmith ||= Blacksmith.new
+end
+
+def org
+  @org ||= Org.find(blacksmith, id: ORG_ID)
+end
+
+def company(id=nil)
+  if id
+    die "Unexpected parameter: #{id} (already loaded #{@company.id})" if @company
+    @company = Company.find(blacksmith, id: id)
+  end
+  @company ||= org.company('ONE') or die "Company #{id} not found" unless @company
+end
+
+def property(id=nil)
+  if id
+    die "Unexpected parameter: #{id} (already loaded #{@property.id})" if @property
+    @property = Property.find(blacksmith, id: id)
+  end
+  @property ||= company.property('ONE') or die "Property #{id} not found"
+end
+
+def extension_package(id=nil)
+  if id
+    die "Unexpected parameter: #{id} (already loaded #{@extension_package.id})" if @extension_package
+    @extension_package = ExtensionPackage.find(blacksmith, id: id)
+  end
+  @extension_package ||= org.extension_package('ONE') or die "ExtensionPackage #{id} not found"
 end
 
 def main
   blacksmith = Blacksmith.new
   puts "Server: #{blacksmith}" if $Verbose >= 1
   org = Org.find(blacksmith, id: ORG_ID)
-  company, property, extension_package = nil, nil, nil
   while ARGV.size > 0
     if ARGV[0] =~ /^CO[0-9a-fA-F]{32}$/
-      id = ARGV.shift
-      if company
-        die "Unexpected parameter: #{id} (already loaded #{company.id})"
-      else
-        (company = Company.find(blacksmith, id: id)) or
-          die "#{id} not found"
-      end
+      company(ARGV.shift)
     elsif ARGV[0] =~ /^PR[0-9a-fA-F]{32}$/
-      id = ARGV.shift
-      if property
-        die "Unexpected parameter: #{id} (already loaded #{property.id})"
-      else
-        (property = Property.find(blacksmith, id: id)) or
-          die "#{id} not found"
-      end
+      property(ARGV.shift)
     elsif ARGV[0] =~ /^EP[0-9a-fA-F]{32}$/
-      id = ARGV.shift
-      if extension_package
-        die "Unexpected parameter: #{id} (already loaded #{extension_package.id})"
-      else
-        (extension_package = ExtensionPackage.find(blacksmith, id: id)) or
-          die "#{id} not found"
-      end
+      extension_package(ARGV.shift)
     else
       die "Unexpected parameter: #{ARGV[0]}\n" +
         "usage: #{$0} [COMPANY_ID] [PROPERTY_ID] [EXTENSION_PACKAGE_ID]"
     end
   end
-  company ||= org.company('ONE')
-  property ||= company.property('ONE')
-  extension_package ||= org.extension_package('ONE')
   property.make_extension(extension_package: extension_package)
 rescue GenericError => error
   puts "Exception:\n  #{error.to_s}"

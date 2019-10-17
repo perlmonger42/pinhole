@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # vim: filetype=ruby
 
-# find-the-host HTa8139fa0d10547c8a6f64912fe6afed4
+# kill-the-host HTa8139fa0d10547c8a6f64912fe6afed4
 #   Delete the identified Host (formerly "Adapter").
 
 require_relative '../pinhole.rb'

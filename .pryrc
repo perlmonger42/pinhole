@@ -3,7 +3,10 @@ $Verbose = 0
 blacksmith = Blacksmith.new
 S = blacksmith
 
-puts "S <- #{S}"
+puts
+puts "=" * 72
+puts "Vars set for you by pinhole/.pryrc:"
+puts %Q(S <- Blacksmith.new "#{S}")
 var = 'REACTOR_TEST_ORG_ID'
 if ENV[var] =~ /^[0-9A-F]{24}@AdobeOrg$/i
   O = Org.find(S, id: ENV[var])

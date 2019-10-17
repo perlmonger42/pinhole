@@ -23,9 +23,20 @@ $Verbose = 2
 # Default create-an-ExtensionPackage zip-file pathname
 $ZipFile = "#{File.dirname(__FILE__)}/scripts/pinhole-test-EP.zip"
 
+class Die < StandardError
+  attr_reader :cause
+  def initialize(msg="Terminated with prejudice")
+    super
+    @cause = msg
+  end
+
+  def to_str
+    "Cause of death: #{@cause}"
+  end
+end
+
 def die(msg)
-  STDERR.puts msg
-  raise "Terminated with prejudice"
+  raise Die.new(msg)
 end
 
 def id_to_type(id)
@@ -238,6 +249,16 @@ class Blacksmith
   def find(klass, *args, **keywords)
     get(klass.search_uri(*args, **keywords))
   end
+
+  # Returns the requested user.
+  # As in Entity.find, id may be nil/user/'ANY'/'NEW'/'ONE'/id.
+  def user(id)
+    User.find(self, id: id, context: {
+      any: lambda { User.users.first },
+      new: lambda { User.fake(org: self) },
+      all: lambda { User.users },
+    })
+  end
 end
 
 # base class for Blacksmith objects
@@ -330,14 +351,15 @@ class Entity
         extra = entity.trace_extra || ''
         extra = " #{extra}" unless extra == ''
         name = entity.name && entity.name != '' ? %Q[ "#{entity.name}"] : ''
-        puts "  #{entity.id}#{extra}#{name}"
+        version = entity.data.dig('attributes', 'version') || ''
+        puts "  #{entity.id}#{extra}#{name} #{version}"
       end
     end
   end
 
   def trace_extra
-    ids = *req_id
-    req_id ? ids[0] : nil
+    ids = *request_id
+    request_id ? ids[0] : nil
   end
 
   def initialize(server, id)
@@ -461,6 +483,8 @@ class Org < Entity
     })
   end
 
+  # TODO: does this belong here? it doesn't seem to use the org; perhaps it
+  # should be a method on Blacksmith instead
   def make_extension_package(zipfilename:)
     ExtensionPackage.fake(org: self, zipfilename: zipfilename)
   end
@@ -482,8 +506,23 @@ end
 class User < Entity
   # Return the URI to search for a company by org_id (defaults to
   # $REACTOR_ORG_ID)
-  def self.search_uri()
-    "/profile"
+  def self.search_uri(id: nil)
+    raise "invalid User ID '#{id}'" unless id =~ /^UR[0-9a-fA-F]{32}$/
+    "/users/#{id}"
+  end
+
+  def self.users
+    unless @users_list
+      users = @server.get('/users')
+      users = *users
+      # The `x = *y` idiom ensures that @users_list is a list. It converts:
+      #   nil => [], c => [c], [] => [], [c] => [c], [c,...] => [c,...]
+      @users_list = *users
+    end
+    @users_hash ||= @users_list.each_with_object({}) do |user, hash|
+      hash[user.id] = user
+    end
+    @users_list
   end
 
   def self.profile(server)
@@ -590,6 +629,10 @@ class Property < Entity
 
   def libraries
     @server.get("/properties/#{@id}/libraries")
+  end
+
+  def notes
+    @server.get("/properties/#{id}/notes");
   end
 
   def rules
@@ -855,19 +898,48 @@ class Library < Entity
     })
   end
 
+  def data_elements
+    # NOTE: This doesn't trace.
+    @server.get("/libraries/#{@id}/data_elements")
+  end
+
+  def environment_id
+    return @environment_id if @environment_id
+    self.load unless @loaded
+    @environment_id = @data.dig('relationships', 'environment', 'data', 'id') || '' if @data
+  end
+
+  def extensions
+    # NOTE: This doesn't trace.
+    @server.get("/libraries/#{@id}/extensions")
+  end
+
+  def notes
+    notes = @server.get("/libraries/#{id}/notes");
+    Entity.trace(notes) if $Verbose >= 1
+    notes
+  end
+
+  def property_id
+    return @property_id if @property_id
+    self.load unless @loaded
+    @property_id = @data.dig('relationships', 'property', 'data', 'id') || '' if @data
+  end
+
   def resources
     # NOTE: This doesn't trace.
     @server.get("/libraries/#{@id}/resources")
   end
 
-  # Returns the requested resource associated with this Company.
-  # As in Entity.find, id may be nil/id/property/'ANY'/'NEW'/'ONE'/'ALL'.
-  def property(id)
-    Property.find(@server, id: id, context: {
-      all: lambda { resources },
-      any: lambda { resources.first },
-      new: lambda { Property.fake(company: self) },
-    })
+  def rules
+    # NOTE: This doesn't trace.
+    @server.get("/libraries/#{@id}/rules")
+  end
+
+  def upstream_library_id
+    return @upstream_library_id if @upstream_library_id
+    self.load unless @loaded
+    @upstream_library_id = @data.dig('relationships', 'upstream_library', 'data', 'id') if @data
   end
 
   def link_resources(*resource_ids)
@@ -909,10 +981,22 @@ class ExtensionPackage < Entity
       __suppress_json_conversion__: true,
     )
     trace(entity)
+    #TODO: public-release the ExtensionPackage?
   end
 
   def trace_extra
-    self.data&.dig('attributes', 'status')
+    status = self.data&.dig('attributes', 'status')
+    avail = self.data&.dig('attributes', 'availability')
+    status = "#{status} #{avail}" if avail
+    if status == 'failed'
+      errors = self.data&.dig('meta', 'status_details', 'errors')
+      if errors && errors.size > 0
+        if errors[0].dig('detail')
+          status = "#{status}: #{errors[0].dig('detail')}"
+        end
+      end
+    end
+    status
   end
 
 end
@@ -931,6 +1015,21 @@ class Build < Entity
   def library=(library)
     @library = library
   end
+end
+
+class Note < Entity
+  # Return the URI to search for a Note by id
+  def self.search_uri(id:)
+    raise "invalid Note ID '#{id}'" unless id =~ /^NT[0-9a-fA-F]{32}$/
+    "/notes/#{id}"
+  end
+
+  def text
+    return @text if @text
+    self.load unless @loaded
+    @text = @data.dig('attributes', 'text')
+  end
+
 end
 
 class Callback < Entity
@@ -960,6 +1059,11 @@ class Callback < Entity
 end
 
 class Resource < Entity
+  def trace_extra
+    time = self.data&.dig('meta', 'deleted_at')
+    "DELETED:#{time}" if time
+  end
+
   def revise
     type = self.class.name.pluralize.underscore
     rev = server.patch("/#{type}/#{id}", body: {
@@ -974,11 +1078,24 @@ class Resource < Entity
     rev
   end
 
+  def deleted_at
+    return @deleted_at if @deleted_at
+    self.load unless @loaded
+    @deleted_at = @data.dig('meta', 'deleted_at') || nil if @data
+  end
+
   def revisions
     type = self.class.name.pluralize.underscore
     revs = @server.get("/#{type}/#{id}/revisions");
     Entity.trace(revs) if $Verbose >= 1
     revs
+  end
+
+  def notes
+    type = self.class.name.pluralize.underscore
+    notes = @server.get("/#{type}/#{id}/notes");
+    Entity.trace(notes) if $Verbose >= 1
+    notes
   end
 end
 
@@ -997,9 +1114,25 @@ class Rule < Resource
     "/rules/#{id}"
   end
 
+  def self.fake(property:)
+    raise "invalid Property #{property.id ? property.id : ''}" unless property.id =~ /^PR[0-9a-fA-F]{32}$/
+    property.server.post("/properties/#{property.id}/rules", body: {
+      data: {
+        attributes: {
+          name: FFaker::Food.vegetable,
+        },
+        type: 'rules'
+      }
+    })
+  end
+
+  def property
+    @property ||= @server.get(data.dig('links', 'property'))
+  end
+
   def rule_components
     rcs = @server.get("/rules/#{id}/rule_components");
-    Entity.trace(rcs) if $Verbose >= 1
+    #Entity.trace(rcs) if $Verbose >= 1
     rcs
   end
 
@@ -1017,6 +1150,31 @@ class RuleComponent < Resource
   def self.search_uri(id:)
     raise "invalid Rule ID '#{id}'" unless id =~ /^RC[0-9a-fA-F]{32}$/
     "/rule_components/#{id}"
+  end
+
+  def self.fake(rule:)
+    property = rule.property
+    coreEx = property.core_extension || die("#{property.id} has no core extension")
+    rule_id = rule.id
+    rc = property.server.post("/properties/#{property.id}/rule_components", body: {
+      data: {
+        attributes: {
+          name: FFaker::Food.herb_or_spice,
+          settings: {
+            bubbleFireIfChildFired: true,
+            bubbleFireIfParent: true,
+            elementSelector: 'a#checkout'
+          }.to_json,
+          order: 1,
+          delegate_descriptor_id: 'core::events::click'
+        },
+        relationships: {
+          extension: { data: { id: coreEx.id, type: 'extensions' } },
+          rules: { data: [{ id: rule_id, type: 'rules' }] }
+        },
+        type: 'rule_components'
+      }
+    })
   end
 
   def rule_id
@@ -1043,7 +1201,7 @@ class DataElement < Resource
           delegate_descriptor_id: 'core::dataElements::javascript-variable',
           enabled: true,
           force_lowercase: false,
-          name: FFaker::Name.name,
+          name: FFaker::Food.fruit,
           settings: '{"path":"data_layer.zomg.shopping_cart"}',
           storage_duration: 'session',
         },

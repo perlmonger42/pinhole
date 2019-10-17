@@ -1,0 +1,2129 @@
+{
+  "name": "kessel-test",
+  "version": "1.2.0",
+  "displayName": "Kessel Test",
+  "platform": "web",
+  "description": "Provides default event, condition, and data element types available to all Launch users.",
+  "iconPath": "resources/icons/core.svg",
+  "author": {
+    "name": "Adobe Systems",
+    "url": "http://adobe.com",
+    "email": "reactor@adobe.com"
+  },
+  "viewBasePath": "dist/",
+  "events": [
+    {
+      "name": "blur",
+      "categoryName": "Form",
+      "displayName": "Blur",
+      "libPath": "src/lib/events/blur.js",
+      "viewPath": "events/blur.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "elementSelector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "elementProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "string"
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["name", "value"]
+            }
+          },
+          "bubbleFireIfParent": {
+            "type": "boolean"
+          },
+          "bubbleFireIfChildFired": {
+            "type": "boolean"
+          },
+          "bubbleStop": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "change",
+      "categoryName": "Form",
+      "displayName": "Change",
+      "libPath": "src/lib/events/change.js",
+      "viewPath": "events/change.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "elementSelector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "elementProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "string"
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["name", "value"]
+            }
+          },
+          "bubbleFireIfParent": {
+            "type": "boolean"
+          },
+          "bubbleFireIfChildFired": {
+            "type": "boolean"
+          },
+          "bubbleStop": {
+            "type": "boolean"
+          },
+          "value": {
+            "type": "string"
+          },
+          "valueIsRegex": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "click",
+      "categoryName": "Mouse",
+      "displayName": "Click",
+      "libPath": "src/lib/events/click.js",
+      "viewPath": "events/click.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "elementSelector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "elementProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "string"
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["name", "value"]
+            }
+          },
+          "bubbleFireIfParent": {
+            "type": "boolean"
+          },
+          "bubbleFireIfChildFired": {
+            "type": "boolean"
+          },
+          "bubbleStop": {
+            "type": "boolean"
+          },
+          "anchorDelay": {
+            "type": "number",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "custom-code",
+      "categoryName": "Other",
+      "displayName": "Custom Code",
+      "libPath": "src/lib/events/customCode.js",
+      "viewPath": "events/customCode.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": ["source"]
+      }
+    },
+    {
+      "name": "custom-event",
+      "categoryName": "Other",
+      "displayName": "Custom Event",
+      "libPath": "src/lib/events/customEvent.js",
+      "viewPath": "events/customEvent.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "elementSelector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "elementProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "string"
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["name", "value"]
+            }
+          },
+          "bubbleFireIfParent": {
+            "type": "boolean"
+          },
+          "bubbleFireIfChildFired": {
+            "type": "boolean"
+          },
+          "bubbleStop": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["type"]
+      }
+    },
+    {
+      "name": "data-element-change",
+      "categoryName": "Other",
+      "displayName": "Data Element Change",
+      "libPath": "src/lib/events/dataElementChange.js",
+      "viewPath": "events/dataElementChange.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": ["name"]
+      }
+    },
+    {
+      "name": "direct-call",
+      "categoryName": "Other",
+      "displayName": "Direct Call",
+      "libPath": "src/lib/events/directCall.js",
+      "viewPath": "events/directCall.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": ["identifier"]
+      }
+    },
+    {
+      "name": "dom-ready",
+      "categoryName": "Page Load",
+      "displayName": "DOM Ready",
+      "libPath": "src/lib/events/domReady.js",
+      "schema": {}
+    },
+    {
+      "name": "element-exists",
+      "categoryName": "Other",
+      "displayName": "Element Exists",
+      "libPath": "src/lib/events/elementExists.js",
+      "viewPath": "events/elementExists.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "elementSelector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "elementProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "string"
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["name", "value"]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": ["elementSelector"]
+      }
+    },
+    {
+      "name": "media-ended",
+      "categoryName": "Media",
+      "displayName": "Media Ended",
+      "libPath": "src/lib/events/mediaEnded.js",
+      "viewPath": "events/mediaEnded.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "elementSelector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "elementProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "string"
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["name", "value"]
+            }
+          },
+          "bubbleFireIfParent": {
+            "type": "boolean"
+          },
+          "bubbleFireIfChildFired": {
+            "type": "boolean"
+          },
+          "bubbleStop": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "enters-viewport",
+      "categoryName": "Other",
+      "displayName": "Enters Viewport",
+      "libPath": "src/lib/events/entersViewport.js",
+      "viewPath": "events/entersViewport.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "elementSelector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "elementProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "string"
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["name", "value"]
+            }
+          },
+          "delay": {
+            "type": "number",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": ["elementSelector"]
+      }
+    },
+    {
+      "name": "focus",
+      "categoryName": "Form",
+      "displayName": "Focus",
+      "libPath": "src/lib/events/focus.js",
+      "viewPath": "events/focus.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "elementSelector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "elementProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "string"
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["name", "value"]
+            }
+          },
+          "bubbleFireIfParent": {
+            "type": "boolean"
+          },
+          "bubbleFireIfChildFired": {
+            "type": "boolean"
+          },
+          "bubbleStop": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "hover",
+      "categoryName": "Mouse",
+      "displayName": "Hover",
+      "libPath": "src/lib/events/hover.js",
+      "viewPath": "events/hover.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "elementSelector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "elementProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "string"
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["name", "value"]
+            }
+          },
+          "bubbleFireIfParent": {
+            "type": "boolean"
+          },
+          "bubbleFireIfChildFired": {
+            "type": "boolean"
+          },
+          "bubbleStop": {
+            "type": "boolean"
+          },
+          "delay": {
+            "type": "number",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": ["elementSelector"]
+      }
+    },
+    {
+      "name": "key-press",
+      "categoryName": "Keyboard",
+      "displayName": "Key Press",
+      "libPath": "src/lib/events/keyPress.js",
+      "viewPath": "events/keyPress.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "elementSelector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "elementProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "string"
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["name", "value"]
+            }
+          },
+          "bubbleFireIfParent": {
+            "type": "boolean"
+          },
+          "bubbleFireIfChildFired": {
+            "type": "boolean"
+          },
+          "bubbleStop": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "media-loaded-data",
+      "categoryName": "Media",
+      "displayName": "Media Loaded Data",
+      "libPath": "src/lib/events/mediaLoadedData.js",
+      "viewPath": "events/mediaLoadedData.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "elementSelector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "elementProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "string"
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["name", "value"]
+            }
+          },
+          "bubbleFireIfParent": {
+            "type": "boolean"
+          },
+          "bubbleFireIfChildFired": {
+            "type": "boolean"
+          },
+          "bubbleStop": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "history-change",
+      "categoryName": "Other",
+      "displayName": "History Change",
+      "libPath": "src/lib/events/historyChange.js",
+      "schema": {}
+    },
+    {
+      "name": "mousedown",
+      "categoryName": "Mouse",
+      "displayName": "Mousedown",
+      "libPath": "src/lib/events/mousedown.js",
+      "viewPath": "events/mousedown.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "elementSelector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "elementProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "string"
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["name", "value"]
+            }
+          },
+          "bubbleFireIfParent": {
+            "type": "boolean"
+          },
+          "bubbleFireIfChildFired": {
+            "type": "boolean"
+          },
+          "bubbleStop": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "window-loaded",
+      "categoryName": "Page Load",
+      "displayName": "Window Loaded",
+      "libPath": "src/lib/events/windowLoaded.js",
+      "schema": {}
+    },
+    {
+      "name": "orientation-change",
+      "categoryName": "Mobile",
+      "displayName": "Orientation Change",
+      "libPath": "src/lib/events/orientationChange.js",
+      "schema": {}
+    },
+    {
+      "name": "page-bottom",
+      "categoryName": "Page Load",
+      "displayName": "Page Bottom",
+      "libPath": "src/lib/events/pageBottom.js",
+      "schema": {}
+    },
+    {
+      "name": "library-loaded",
+      "categoryName": "Page Load",
+      "displayName": "Library Loaded (Page Top)",
+      "libPath": "src/lib/events/libraryLoaded.js",
+      "schema": {}
+    },
+    {
+      "name": "media-pause",
+      "categoryName": "Media",
+      "displayName": "Media Pause",
+      "libPath": "src/lib/events/mediaPause.js",
+      "viewPath": "events/mediaPause.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "elementSelector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "elementProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "string"
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["name", "value"]
+            }
+          },
+          "bubbleFireIfParent": {
+            "type": "boolean"
+          },
+          "bubbleFireIfChildFired": {
+            "type": "boolean"
+          },
+          "bubbleStop": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "media-play",
+      "categoryName": "Media",
+      "displayName": "Media Play",
+      "libPath": "src/lib/events/mediaPlay.js",
+      "viewPath": "events/mediaPlay.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "elementSelector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "elementProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "string"
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["name", "value"]
+            }
+          },
+          "bubbleFireIfParent": {
+            "type": "boolean"
+          },
+          "bubbleFireIfChildFired": {
+            "type": "boolean"
+          },
+          "bubbleStop": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "media-stalled",
+      "categoryName": "Media",
+      "displayName": "Media Stalled",
+      "libPath": "src/lib/events/mediaStalled.js",
+      "viewPath": "events/mediaStalled.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "elementSelector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "elementProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "string"
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["name", "value"]
+            }
+          },
+          "bubbleFireIfParent": {
+            "type": "boolean"
+          },
+          "bubbleFireIfChildFired": {
+            "type": "boolean"
+          },
+          "bubbleStop": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "submit",
+      "categoryName": "Form",
+      "displayName": "Submit",
+      "libPath": "src/lib/events/submit.js",
+      "viewPath": "events/submit.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "elementSelector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "elementProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "string"
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["name", "value"]
+            }
+          },
+          "bubbleFireIfParent": {
+            "type": "boolean"
+          },
+          "bubbleFireIfChildFired": {
+            "type": "boolean"
+          },
+          "bubbleStop": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "tab-blur",
+      "categoryName": "Browser",
+      "displayName": "Tab Blur",
+      "libPath": "src/lib/events/tabBlur.js",
+      "schema": {}
+    },
+    {
+      "name": "tab-focus",
+      "categoryName": "Browser",
+      "displayName": "Tab Focus",
+      "libPath": "src/lib/events/tabFocus.js",
+      "schema": {}
+    },
+    {
+      "name": "time-on-page",
+      "categoryName": "Other",
+      "displayName": "Time On Page",
+      "libPath": "src/lib/events/timeOnPage.js",
+      "viewPath": "events/timeOnPage.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "timeOnPage": {
+            "type": "number",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": ["timeOnPage"]
+      }
+    },
+    {
+      "name": "media-time-played",
+      "categoryName": "Media",
+      "displayName": "Media Time Played",
+      "libPath": "src/lib/events/mediaTimePlayed.js",
+      "viewPath": "events/mediaTimePlayed.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "elementSelector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "elementProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "string"
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["name", "value"]
+            }
+          },
+          "bubbleFireIfParent": {
+            "type": "boolean"
+          },
+          "bubbleFireIfChildFired": {
+            "type": "boolean"
+          },
+          "bubbleStop": {
+            "type": "boolean"
+          },
+          "amount": {
+            "type": "number",
+            "minimum": 0
+          },
+          "unit": {
+            "type": "string",
+            "enum": ["percent", "second"]
+          }
+        },
+        "additionalProperties": false,
+        "required": ["amount", "unit"]
+      }
+    },
+    {
+      "name": "media-volume-change",
+      "categoryName": "Media",
+      "displayName": "Media Volume Change",
+      "libPath": "src/lib/events/mediaVolumeChange.js",
+      "viewPath": "events/mediaVolumeChange.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "elementSelector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "elementProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "string"
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["name", "value"]
+            }
+          },
+          "bubbleFireIfParent": {
+            "type": "boolean"
+          },
+          "bubbleFireIfChildFired": {
+            "type": "boolean"
+          },
+          "bubbleStop": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "zoom-change",
+      "categoryName": "Mobile",
+      "displayName": "Zoom Change",
+      "libPath": "src/lib/events/zoomChange.js",
+      "schema": {}
+    }
+  ],
+  "conditions": [
+    {
+      "name": "browser",
+      "categoryName": "Technology",
+      "displayName": "Browser",
+      "libPath": "src/lib/conditions/browser.js",
+      "viewPath": "conditions/browser.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "browsers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Chrome",
+                "Firefox",
+                "IE",
+                "Edge",
+                "Safari",
+                "Mobile Safari"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": ["browsers"]
+      }
+    },
+    {
+      "name": "cookie",
+      "categoryName": "Data",
+      "displayName": "Cookie",
+      "libPath": "src/lib/conditions/cookie.js",
+      "viewPath": "conditions/cookie.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "name": {
+            "pattern": "^[A-Za-z0-9!#$%&'*+\\-.^_|~]+$"
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1
+          },
+          "valueIsRegex": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["name", "value"]
+      }
+    },
+    {
+      "name": "custom-code",
+      "categoryName": "Data",
+      "displayName": "Custom Code",
+      "libPath": "src/lib/conditions/customCode.js",
+      "viewPath": "conditions/customCode.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": ["source"]
+      }
+    },
+    {
+      "name": "date-range",
+      "categoryName": "Other",
+      "displayName": "Date Range",
+      "libPath": "src/lib/conditions/dateRange.js",
+      "viewPath": "conditions/dateRange.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "timezone": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "device-type",
+      "categoryName": "Technology",
+      "displayName": "Device Type",
+      "libPath": "src/lib/conditions/deviceType.js",
+      "viewPath": "conditions/deviceType.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "deviceTypes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Desktop",
+                "iPhone",
+                "iPad",
+                "iPod",
+                "Nokia",
+                "Windows Phone",
+                "Blackberry",
+                "Android"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": ["deviceTypes"]
+      }
+    },
+    {
+      "name": "domain",
+      "categoryName": "URL",
+      "displayName": "Domain",
+      "libPath": "src/lib/conditions/domain.js",
+      "viewPath": "conditions/domain.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": ["domains"]
+      }
+    },
+    {
+      "name": "hash",
+      "categoryName": "URL",
+      "displayName": "Hash",
+      "libPath": "src/lib/conditions/hash.js",
+      "viewPath": "conditions/hash.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "hashes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["value"]
+            },
+            "minItems": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": ["hashes"]
+      }
+    },
+    {
+      "name": "landing-page",
+      "categoryName": "Engagement",
+      "displayName": "Landing Page",
+      "libPath": "src/lib/conditions/landingPage.js",
+      "viewPath": "conditions/landingPage.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "string",
+            "minLength": 1
+          },
+          "pageIsRegex": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["page"]
+      }
+    },
+    {
+      "name": "max-frequency",
+      "categoryName": "Other",
+      "displayName": "Max Frequency",
+      "libPath": "src/lib/conditions/maxFrequency.js",
+      "viewPath": "conditions/maxFrequency.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "oneOf": [
+          {
+            "properties": {
+              "count": {
+                "type": "number",
+                "minimum": 1
+              },
+              "unit": {
+                "type": "string",
+                "enum": [
+                  "pageView",
+                  "session",
+                  "visitor",
+                  "second",
+                  "minute",
+                  "day",
+                  "week",
+                  "month"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "count",
+              "unit"
+            ]
+          },
+          {
+            "properties": {
+              "unit": {
+                "type": "string",
+                "enum": [
+                  "visitor"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "unit"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "new-returning-visitor",
+      "categoryName": "Engagement",
+      "displayName": "New/Returning Visitor",
+      "libPath": "src/lib/conditions/newReturningVisitor.js",
+      "viewPath": "conditions/newReturningVisitor.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "isNewVisitor": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["isNewVisitor"]
+      }
+    },
+    {
+      "name": "operating-system",
+      "categoryName": "Technology",
+      "displayName": "Operating System",
+      "libPath": "src/lib/conditions/operatingSystem.js",
+      "viewPath": "conditions/operatingSystem.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "operatingSystems": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Windows",
+                "MacOS",
+                "Linux",
+                "Unix",
+                "iOS",
+                "Android"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": ["operatingSystems"]
+      }
+    },
+    {
+      "name": "page-views",
+      "categoryName": "Engagement",
+      "displayName": "Page Views",
+      "libPath": "src/lib/conditions/pageViews.js",
+      "viewPath": "conditions/pageViews.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "operator": {
+            "type": "string",
+            "enum": [
+              ">",
+              "=",
+              "<"
+            ]
+          },
+          "count": {
+            "type": "number"
+          },
+          "duration": {
+            "type": "string",
+            "enum": [
+              "lifetime",
+              "session"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": ["operator", "count", "duration"]
+      }
+    },
+    {
+      "name": "path",
+      "categoryName": "URL",
+      "displayName": "Path Without Query String",
+      "libPath": "src/lib/conditions/path.js",
+      "viewPath": "conditions/path.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "paths": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["value"]
+            },
+            "minItems": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": ["paths"]
+      }
+    },
+    {
+      "name": "path-and-querystring",
+      "categoryName": "URL",
+      "displayName": "Path And Query String",
+      "libPath": "src/lib/conditions/pathAndQuerystring.js",
+      "viewPath": "conditions/pathAndQuerystring.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "paths": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["value"]
+            },
+            "minItems": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": ["paths"]
+      }
+    },
+    {
+      "name": "protocol",
+      "categoryName": "URL",
+      "displayName": "Protocol",
+      "libPath": "src/lib/conditions/protocol.js",
+      "viewPath": "conditions/protocol.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "type": "string",
+            "enum": [
+              "http:",
+              "https:"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": ["protocol"]
+      }
+    },
+    {
+      "name": "screen-resolution",
+      "categoryName": "Technology",
+      "displayName": "Screen Resolution",
+      "libPath": "src/lib/conditions/screenResolution.js",
+      "viewPath": "conditions/screenResolution.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "widthOperator": {
+            "type": "string",
+            "enum": [
+              ">",
+              "=",
+              "<"
+            ]
+          },
+          "width": {
+            "type": "number"
+          },
+          "heightOperator": {
+            "type": "string",
+            "enum": [
+              ">",
+              "=",
+              "<"
+            ]
+          },
+          "height": {
+            "type": "number"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["widthOperator", "width", "heightOperator", "height"]
+      }
+    },
+    {
+      "name": "sampling",
+      "categoryName": "Other",
+      "displayName": "Sampling",
+      "libPath": "src/lib/conditions/sampling.js",
+      "viewPath": "conditions/sampling.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "rate": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": ["rate"]
+      }
+    },
+    {
+      "name": "sessions",
+      "categoryName": "Engagement",
+      "displayName": "Sessions",
+      "libPath": "src/lib/conditions/sessions.js",
+      "viewPath": "conditions/sessions.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "operator": {
+            "type": "string",
+            "enum": [
+              ">",
+              "=",
+              "<"
+            ]
+          },
+          "count": {
+            "type": "number"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["operator", "count"]
+      }
+    },
+    {
+      "name": "subdomain",
+      "categoryName": "URL",
+      "displayName": "Subdomain",
+      "libPath": "src/lib/conditions/subdomain.js",
+      "viewPath": "conditions/subdomain.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "subdomains": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "valueIsRegex": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": ["value"]
+            },
+            "minItems": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": ["subdomains"]
+      }
+    },
+    {
+      "name": "time-on-site",
+      "categoryName": "Engagement",
+      "displayName": "Time On Site",
+      "libPath": "src/lib/conditions/timeOnSite.js",
+      "viewPath": "conditions/timeOnSite.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "operator": {
+            "type": "string",
+            "enum": [
+              ">",
+              "=",
+              "<"
+            ]
+          },
+          "minutes": {
+            "type": "number"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["operator", "minutes"]
+      }
+    },
+    {
+      "name": "traffic-source",
+      "categoryName": "Engagement",
+      "displayName": "Traffic Source",
+      "libPath": "src/lib/conditions/trafficSource.js",
+      "viewPath": "conditions/trafficSource.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sourceIsRegex": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["source"]
+      }
+    },
+    {
+      "name": "query-string-parameter",
+      "categoryName": "URL",
+      "displayName": "Query String Parameter",
+      "libPath": "src/lib/conditions/queryStringParameter.js",
+      "viewPath": "conditions/queryStringParameter.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1
+          },
+          "valueIsRegex": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["name", "value"]
+      }
+    },
+    {
+      "name": "value-comparison",
+      "categoryName": "Data",
+      "displayName": "Value Comparison",
+      "libPath": "src/lib/conditions/valueComparison.js",
+      "viewPath": "conditions/valueComparison.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "oneOf": [
+          {
+            "properties": {
+              "leftOperand": {
+                "type": "string",
+                "pattern": "^%([^%]+)%$"
+              },
+              "comparison": {
+                "type": "object",
+                "properties": {
+                  "operator": {
+                    "type": "string",
+                    "enum": [
+                      "equals",
+                      "doesNotEqual"
+                    ]
+                  },
+                  "caseInsensitive": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "operator"
+                ],
+                "additionalProperties": false
+              },
+              "rightOperand": {
+                "oneOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "leftOperand",
+              "comparison",
+              "rightOperand"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "properties": {
+              "leftOperand": {
+                "type": "string",
+                "pattern": "^%([^%]+)%$"
+              },
+              "comparison": {
+                "type": "object",
+                "properties": {
+                  "operator": {
+                    "type": "string",
+                    "enum": [
+                      "contains",
+                      "doesNotContain",
+                      "startsWith",
+                      "doesNotStartWith",
+                      "endsWith",
+                      "doesNotEndWith",
+                      "matchesRegex",
+                      "doesNotMatchRegex"
+                    ]
+                  },
+                  "caseInsensitive": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "operator"
+                ],
+                "additionalProperties": false
+              },
+              "rightOperand": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "leftOperand",
+              "comparison",
+              "rightOperand"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "properties": {
+              "leftOperand": {
+                "type": "string",
+                "pattern": "^%([^%]+)%$"
+              },
+              "comparison": {
+                "type": "object",
+                "properties": {
+                  "operator": {
+                    "type": "string",
+                    "enum": [
+                      "lessThan",
+                      "lessThanOrEqual",
+                      "greaterThan",
+                      "greaterThanOrEqual"
+                    ]
+                  }
+                },
+                "required": [
+                  "operator"
+                ],
+                "additionalProperties": false
+              },
+              "rightOperand": {
+                "oneOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^%([^%]+)%$"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "leftOperand",
+              "comparison",
+              "rightOperand"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "properties": {
+              "leftOperand": {
+                "type": "string",
+                "pattern": "^%([^%]+)%$"
+              },
+              "comparison": {
+                "type": "object",
+                "properties": {
+                  "operator": {
+                    "type": "string",
+                    "enum": [
+                      "isTrue",
+                      "isTruthy",
+                      "isFalse",
+                      "isFalsy"
+                    ]
+                  }
+                },
+                "required": [
+                  "operator"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "leftOperand",
+              "comparison"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "variable",
+      "categoryName": "Data",
+      "displayName": "Variable",
+      "libPath": "src/lib/conditions/variable.js",
+      "viewPath": "conditions/variable.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1
+          },
+          "valueIsRegex": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["name", "value"]
+      }
+    },
+    {
+      "name": "window-size",
+      "categoryName": "Technology",
+      "displayName": "Window Size",
+      "libPath": "src/lib/conditions/windowSize.js",
+      "viewPath": "conditions/windowSize.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "widthOperator": {
+            "type": "string",
+            "enum": [
+              ">",
+              "=",
+              "<"
+            ]
+          },
+          "width": {
+            "type": "number"
+          },
+          "heightOperator": {
+            "type": "string",
+            "enum": [
+              ">",
+              "=",
+              "<"
+            ]
+          },
+          "height": {
+            "type": "number"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["widthOperator", "width", "heightOperator", "height"]
+      }
+    }
+  ],
+  "dataElements": [
+    {
+      "name": "cookie",
+      "displayName": "Cookie",
+      "libPath": "src/lib/dataElements/cookie.js",
+      "viewPath": "dataElements/cookie.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": ["name"]
+      }
+    },
+    {
+      "name": "custom-code",
+      "displayName": "Custom Code",
+      "libPath": "src/lib/dataElements/customCode.js",
+      "viewPath": "dataElements/customCode.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": ["source"]
+      }
+    },
+    {
+      "name": "dom-attribute",
+      "displayName": "DOM Attribute",
+      "libPath": "src/lib/dataElements/domAttribute.js",
+      "viewPath": "dataElements/domAttribute.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "elementSelector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "elementProperty": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": ["elementSelector", "elementProperty"]
+      }
+    },
+    {
+      "name": "local-storage",
+      "displayName": "Local Storage",
+      "libPath": "src/lib/dataElements/localStorage.js",
+      "viewPath": "dataElements/localStorage.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": ["name"]
+      }
+    },
+    {
+      "name": "page-info",
+      "displayName": "Page Info",
+      "libPath": "src/lib/dataElements/pageInfo.js",
+      "viewPath": "dataElements/pageInfo.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "attribute": {
+            "enum": [
+              "url",
+              "hostname",
+              "pathname",
+              "protocol",
+              "referrer",
+              "title"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": ["attribute"]
+      }
+    },
+    {
+      "name": "query-string-parameter",
+      "displayName": "Query String Parameter",
+      "libPath": "src/lib/dataElements/queryStringParameter.js",
+      "viewPath": "dataElements/queryStringParameter.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "caseInsensitive": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["name"]
+      }
+    },
+    {
+      "name": "random-number",
+      "displayName": "Random Number",
+      "libPath": "src/lib/dataElements/randomNumber.js",
+      "viewPath": "dataElements/randomNumber.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "min": {
+            "type": "integer"
+          },
+          "max": {
+            "type": "integer"
+          }
+        },
+        "required": ["min", "max"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "session-storage",
+      "displayName": "Session Storage",
+      "libPath": "src/lib/dataElements/sessionStorage.js",
+      "viewPath": "dataElements/sessionStorage.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": ["name"]
+      }
+    },
+    {
+      "name": "javascript-variable",
+      "displayName": "JavaScript Variable",
+      "libPath": "src/lib/dataElements/javascriptVariable.js",
+      "viewPath": "dataElements/javascriptVariable.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": ["path"]
+      }
+    },
+    {
+      "name": "visitor-behavior",
+      "displayName": "Visitor Behavior",
+      "libPath": "src/lib/dataElements/visitorBehavior.js",
+      "viewPath": "dataElements/visitorBehavior.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "properties": {
+          "attribute": {
+            "enum": [
+              "landingPage",
+              "trafficSource",
+              "minutesOnSite",
+              "sessionCount",
+              "sessionPageViewCount",
+              "lifetimePageViewCount",
+              "isNewVisitor"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": ["attribute"]
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "custom-code",
+      "displayName": "Custom Code",
+      "libPath": "src/lib/actions/customCode.js",
+      "viewPath": "actions/customCode.html",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "oneOf": [
+          {
+            "properties": {
+              "language": {
+                "enum": [
+                  "javascript"
+                ]
+              },
+              "global": {
+                "type": "boolean"
+              },
+              "source": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "language",
+              "source"
+            ]
+          },
+          {
+            "properties": {
+              "language": {
+                "enum": [
+                  "html"
+                ]
+              },
+              "source": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "language",
+              "source"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

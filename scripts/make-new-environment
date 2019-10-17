@@ -1,0 +1,80 @@
+#!/usr/bin/env ruby
+# vim: filetype=ruby
+
+# make-new-environment
+#   Find any Company in my Org.
+#   Find or fake one Property on the Company.
+#   Find or fake one Host on the Property.
+#   Make new Environment on the Property, connected to the Host.
+#
+# make-new-environment PRa8139fa0d10547c8a6f64912fe6afed4
+#   Find or fake one Host on the Property.
+#   Make new Environment on the Property, connected to the Host.
+#
+# make-new-environment HTfdd4d9296a7b485ba83c378da61c9cfa
+#   Find the Host and its related Property.
+#   Make new Environment on the Property, connected to the Host.
+
+require 'json'
+require_relative '../pinhole.rb'
+
+ORG_ID = ENV['REACTOR_ORG_ID']
+PROPERTY_ID_REGEX = /^PR[0-9a-fA-F]{32}$/
+HOST_ID_REGEX = /^HT[0-9a-fA-F]{32}$/
+$Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
+
+def die(msg)
+  puts msg
+  exit 1
+end
+
+def determine_requested_id
+  if ARGV.size == 1
+    if HOST_ID_REGEX =~ ARGV[0]
+      return ARGV[0]
+    elsif PROPERTY_ID_REGEX =~ ARGV[0]
+      return ARGV[0]
+    else
+      puts "#{ARGV[0]} is neither a Property ID nor a Host ID"
+      puts "The argument must match #{PROPERTY_ID_REGEX} or #{HOST_ID_REGEX}"
+      exit 1
+    end
+  end
+  if ARGV.size == 0
+    if ENV.has_key?('REACTOR_HOST_ID') && ENV['REACTOR_HOST_ID'] != ''
+      arg = ENV['REACTOR_HOST_ID']
+      src = '$REACTOR_HOST_ID'
+      return arg if arg =~ HOST_ID_REGEX
+      puts "#{src} is not a Host ID; it must match #{HOST_ID_REGEX}"
+      exit 1
+    elsif ENV.has_key?('REACTOR_PROPERTY_ID') && ENV['REACTOR_PROPERTY_ID'] != ''
+      arg = ENV['REACTOR_PROPERTY_ID']
+      src = '$REACTOR_PROPERTY_ID'
+      return arg if arg =~ PROPERTY_ID_REGEX
+      puts "#{src} is not a Property ID; it must match #{PROPERTY_ID_REGEX}"
+      exit 1
+    end
+  end
+  puts "usage: #{$0} [PROPERTY_ID|HOST_ID]"
+  puts "       defaults to \$REACTOR_HOST_ID or \$REACTOR_PROPERTY_ID"
+  exit 1
+end
+
+def main
+  id = determine_requested_id
+  blacksmith = Blacksmith.new
+  puts "Server: #{blacksmith}" if $Verbose >= 1
+  if HOST_ID_REGEX =~ id
+    host = Host.find(blacksmith, id: id);
+    property = host.property
+  else
+    property = Property.find(blacksmith, id: id);
+    host = property.host('ONE')
+  end
+  environment = property.environment('NEW', host: host)
+rescue StandardError => error
+  puts "Exception:\n  #{error.to_s}"
+end
+
+main
+

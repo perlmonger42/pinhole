@@ -1,25 +1,18 @@
 #!/usr/bin/env ruby
 # vim: filetype=ruby
 
-# make-new-rule-component
+# make-new-rule
 #   Find any Company in my Org.
 #   Find or fake one Property on the Company.
-#   Find or fake one Rule on the Property.
-#   Make new RuleComponent on the Property, connected to the Rule.
+#   Make new Rule on the Property.
 #
-# make-new-rule-component PRa8139fa0d10547c8a6f64912fe6afed4
-#   Find or fake one Rule on the identified property.
-#   Make new RuleComponent on the Property, connected to the Rule.
-#
-# make-new-rule-component RL081f494b3cfe4937a24390d93f012b2c
-#   Make new RuleComponent on the identified Rule.
+# make-new-rule PRa8139fa0d10547c8a6f64912fe6afed4
+#   Make new Rule on the named Property.
 
-require 'json'
 require_relative '../pinhole.rb'
 
 ORG_ID = ENV['REACTOR_ORG_ID']
 PROPERTY_ID_REGEX = /^PR[0-9a-fA-F]{32}$/
-RULE_ID_REGEX = /^RL[0-9a-fA-F]{32}$/
 $Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
 
 def die(msg)
@@ -28,9 +21,6 @@ def die(msg)
 end
 
 def determine_requested_property_id
-  if ARGV.size == 1 && RULE_ID_REGEX =~ ARGV[0]
-    return ARGV[0]
-  end
   if ARGV.size == 0
     if ENV.has_key?('REACTOR_PROPERTY_ID') && ENV['REACTOR_PROPERTY_ID'] != ''
       arg = ENV['REACTOR_PROPERTY_ID']
@@ -38,8 +28,6 @@ def determine_requested_property_id
     else
       arg = 'ONE'
     end
-  elsif ARGV.size == 1 && RULE_ID_REGEX =~ ARGV[0]
-    die "RL argument not yet supported"
   elsif ARGV.size == 1
     arg = ARGV[0]
     src = 'PROPERTY_ID'
@@ -57,22 +45,14 @@ def determine_requested_property_id
 end
 
 def main
-  property_id = determine_requested_property_id
+  id = determine_requested_property_id
   blacksmith = Blacksmith.new
   puts "Server: #{blacksmith}" if $Verbose >= 1
-  if RULE_ID_REGEX =~ property_id
-    rule_id, property_id = property_id, nil
-    rule = Rule.find(blacksmith, id: rule_id, context:{})
-  else
-    org = Org.find(blacksmith, id: ORG_ID)
-    property = org.company('ANY').property(property_id)
-    rule = property.rule('ONE')
-  end
-  rule_component = rule.rule_component('NEW')
-  puts rule_component.to_json
-rescue StandardError => error
+  org = Org.find(blacksmith, id: ORG_ID)
+  property = org.company('ANY').property(id)
+  property.rule('NEW')
+rescue GenericError => error
   puts "Exception:\n  #{error.to_s}"
 end
 
 main
-

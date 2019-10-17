@@ -2,10 +2,7 @@
 # vim: filetype=ruby
 
 # make-new-extension-package
-#   Find or fake one Company in my Org.
-#   Find or fake one Property on the Company.
-#   Find or fake one Extension Package accessible to (? my Org).
-#   Make a new Extension on the Property based on the Extension Package.
+#   Make a new ExtensionPackage, using `./pinhole-test-EP.zip`.
 
 require_relative '../pinhole.rb'
 
@@ -13,18 +10,15 @@ ORG_ID = ENV['REACTOR_ORG_ID']
 $Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
 $ZipFile = "#{File.dirname(__FILE__)}/pinhole-test-EP.zip"
 
-def die(msg)
-  STDERR.puts msg
-  raise "Terminated with prejudice"
-end
-
 def main
-  blacksmith = Blacksmith.new
-  puts "Server: #{blacksmith}" if $Verbose >= 1
-  org = Org.find(blacksmith, id: ORG_ID)
-  org.make_extension_package(zipfilename: $ZipFile)
-rescue GenericError => error
-  puts "Exception:\n  #{error.to_s}"
+  begin
+    blacksmith = Blacksmith.new
+    puts "Server: #{blacksmith}" if $Verbose >= 1
+    org = Org.find(blacksmith, id: ORG_ID)
+    org.make_extension_package(zipfilename: $ZipFile)
+  rescue StandardError => error
+    puts "Exception:\n  #{error.to_s}"
+  end
 end
 
 main

@@ -19,12 +19,12 @@ class Object
 end
 
 class Array
-  def show_list(type, indent)
+  def show_list(type, indent, hide_missing_list: false)
     if size > 0
       # puts "#{indent}#{type} (#{size})" unless type == 'no heading'
       each { |element| element.show(indent) }
-    elsif type != "no heading"
-      puts "#{indent}no #{type}"
+    else
+      puts "#{indent}no #{type}" unless hide_missing_list
     end
   end
   def show(indent)
@@ -42,30 +42,40 @@ class Entity
     name && name != '' ? %Q[ "#{name}"] : ''
   end
 
+  def deleted
+    self.respond_to?(:deleted_at) && deleted_at ? " soft-deleted" : ''
+  end
+
   def basic_show(indent, extra = nil)
     extra_text = extra && extra != '' ? " #{extra}" : ''
-    puts "#{indent}#{id}#{display_revision}#{display_name}#{extra_text}"
+    puts "#{indent}#{id}#{display_revision}#{display_name}#{deleted}#{extra_text}"
+    if self.respond_to?(:notes) && !(list = notes).empty?
+      self.notes.show_list('Notes', indent + '  Note: ')
+    end
+  end
+end
+
+class Note
+  def show(indent)
+    s = text.gsub(/\n/, '\n')
+    s = "#{s[0..46]}..." if s.size > 60
+    basic_show(indent, s)
   end
 end
 
 class Build
-  def get_library
+  def lib_str
     lib_id = data && data.dig('relationships', 'library', 'data', 'id')
-    lib_id == '' ? nil : "of #{lib_id}"
+    lib_id && lib_id != '' ? " #{lib_id}" : ''
   end
 
-  def get_status
+  def status_str
     status = data && data.dig('attributes', 'status')
-    status == '' ? nil : status
-  end
-
-  def at
-    time = data.dig('attributres', 'updated_at') || data.dig('attributes', 'created_at')
-    time == '' ? nil : "at #{time}"
+    status && status != '' ? " #{status}" : ''
   end
 
   def show(indent)
-    basic_show(indent, [get_library, get_status, at].compact.join(' '))
+    basic_show(indent, "#{lib_str}#{status_str}")
   end
 end
 
@@ -82,8 +92,13 @@ class Library
   def show(indent)
     basic_show(indent)
     indent += '  '
-    resources.show_list('resources', indent)
-    builds.show_list('Builds', indent)
+    puts "#{indent}property: #{property_id}"
+    puts "#{indent}environment: #{environment_id}"
+    puts "#{indent}upstream_library: #{upstream_library_id}" if upstream_library_id
+    extensions.show_list('Extensions', indent, hide_missing_list: true)
+    data_elements.show_list('DataElements', indent, hide_missing_list: true)
+    rules.show_list('Rules', indent, hide_missing_list: true)
+    builds.show_list('Builds', indent, hide_missing_list: true)
   end
 end
 
@@ -93,6 +108,7 @@ class Property
     indent += '  '
     libraries.show_list('Libraries', indent)
     rules.show_list('Rules', indent)
+    data_elements.show_list('DataElements', indent)
     callbacks.show_list('Callbacks', indent)
     extensions.show_list('Extensions', indent)
   end
@@ -101,7 +117,7 @@ end
 class Rule
   def show(indent)
     basic_show(indent)
-    rule_components.show_list('no heading', indent + '  ')
+    rule_components.show_list('RuleComponents', indent + '  ')
   end
 end
 

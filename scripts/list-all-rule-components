@@ -1,0 +1,60 @@
+#!/usr/bin/env ruby
+# vim: filetype=ruby
+
+# list-all-rule-components
+#   List all the RuleComponents on all Rules on all Properties on any Company in my Org.
+#
+# list-all-rule-components PRa8139fa0d10547c8a6f64912fe6afed4
+#   List all the RuleComponents on all Rules on the named Property.
+#
+# list-all-rule-components RLa8139fa0d10547c8a6f64912fe6afed4
+#   List all the RuleComponents on the named Rule.
+
+require_relative '../pinhole.rb'
+
+ORG_ID = ENV['REACTOR_ORG_ID']
+$Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
+
+def main
+  blacksmith = Blacksmith.new
+  puts "Server: #{blacksmith}" if $Verbose >= 1
+  if ARGV.size > 1
+    puts "usage: #{$0} [PROPERTY_ID]"
+    exit 1
+  elsif ARGV.size == 1 && ARGV[0] =~ /^PR[0-9a-fA-F]{32}$/
+    property = Property.find(blacksmith, id: ARGV[0])
+    show_rule_components_of_property(property)
+    exit 0
+  elsif ARGV.size == 1 && ARGV[0] =~ /^RL[0-9a-fA-F]{32}$/
+    rule = Rule.find(blacksmith, id: ARGV[0])
+    show_rule_components_of_rule(rule)
+    exit 0
+  elsif ARGV.size > 0
+    puts "Argument is not a Property nor Rule ID: #{ARGV[0]}"
+    exit 1
+  else
+    org = Org.find(blacksmith, id: ORG_ID)
+    properties = org.company('ANY').property('ALL')
+    properties.each { |pr| show_rule_components_of_property(pr) }
+  end
+rescue StandardError => error
+  puts "Exception:\n  #{error.to_s}"
+end
+
+def show_rule_components_of_rule(rule)
+  rule.rule_component('ALL')
+end
+
+def show_rule_components_of_property(property)
+  rules = property.rule('ALL')
+  rules.each do |rule|
+    puts "  Revisions for #{rule.id}:"
+    revs = rule.revisions
+    revs.each do |rule_rev|
+      puts "  Rule #{rule_rev.id} is revision ##{rule_rev.data.dig('attributes','revision_number')}"
+      show_rule_components_of_rule(rule_rev)
+    end
+  end
+end
+
+main

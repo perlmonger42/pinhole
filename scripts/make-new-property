@@ -1,8 +1,12 @@
 #!/usr/bin/env ruby
 # vim: filetype=ruby
 
-# make-new-property:
+# make-new-property: [--fill]
 #   Create a new faked property on any company in my org
+#   If the --fill options is given, fill the property with:
+#     a host
+#     an environment
+#     2 rules, each containing 2 rule components each
 
 require_relative '../pinhole.rb'
 
@@ -10,12 +14,22 @@ ORG_ID = ENV['REACTOR_ORG_ID']
 $Verbose = ENV['PINHOLE_VERBOSITY'] =~ /^\d+$/ ? $&.to_i :  2
 
 def main
+  fill = ARGV[0] == '--fill'
   blacksmith = Blacksmith.new
   puts "Server: #{blacksmith}" if $Verbose >= 1
   org = Org.find(blacksmith, id: ORG_ID)
-  org.company('ANY').property('NEW')
+  property = org.company('ANY').property('NEW')
+  fill_property(property) if fill
 rescue GenericError => error
   puts "Exception:\n  #{error.to_s}"
+end
+
+def fill_property(property)
+  property.environment('NEW', host: property.host('NEW'))
+  rule = property.rule('NEW')
+  rule_components = [rule.rule_component('NEW'), rule.rule_component('NEW')]
+  rule = property.rule('NEW')
+  rule_components = [rule.rule_component('NEW'), rule.rule_component('NEW')]
 end
 
 main
